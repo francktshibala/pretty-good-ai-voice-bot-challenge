@@ -167,3 +167,13 @@ All five pieces done and proven on real calls, not assumed:
 Three real bugs were hit and fixed along the way (stdout buffering hiding logs, an invalid ElevenLabs voice ID misread as a billing restriction, and a recording-resource-exists-but-media-not-ready race condition) — each is a genuine debugging example for the video walkthrough, not staged. Next: Step 2, swapping the scripted reply for real LLM reasoning with a patient persona.
 
 ---
+
+## 2026-08-19 — Step 2, piece 1: real LLM reasoning confirmed
+
+**What happened:** Replaced the fixed `SCRIPTED_REPLY_TEXT` with a real call to Anthropic's API (`claude-sonnet-5`, direct HTTP via `requests` — consistent with the minimal-dependency pattern used for Deepgram/ElevenLabs elsewhere in this file, no SDK). Kept the architecture otherwise unchanged from Step 1 (still one exchange, then hang up) deliberately, to isolate "does the LLM call actually work in this pipeline" from the much larger change of making the conversation continue for multiple turns — that's piece 2, not this one. Used a placeholder patient-persona system prompt (scheduling for knee pain) as a stand-in; a deliberately designed persona/scenario comes with piece 2.
+
+Ran a real test call: the LLM produced a genuinely natural, in-character reply — *"Oh, okay, no problem. Hi there, I'm calling to schedule an appointment — I've been having some knee pain and wanted to get it looked at."* — correctly acknowledging the recording disclosure before stating its purpose, rather than ignoring context. Full pipeline held together with the added LLM latency: call ran 19.7s (vs ~13s for the scripted-reply runs), transcript and recording both saved correctly.
+
+**Not yet done:** Still single-exchange — the call ends after one reply rather than continuing to listen for the clinic agent's actual response. Piece 2 (next): make the conversation continue across multiple turns until a natural end, with a deliberately designed persona and scenario goal instead of the placeholder prompt.
+
+---

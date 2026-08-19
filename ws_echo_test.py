@@ -1,4 +1,9 @@
 """
+Step 2, piece 1: real LLM reasoning replaces the scripted reply — still a
+single exchange (reply once, hang up) to isolate "does the LLM call work
+inside this pipeline" before piece 2 builds the harder part: a continuing
+multi-turn conversation with a real patient persona.
+
 Step 1, pieces 2-4, built as one evolving server.
 
 Piece 2, sub-pieces 1-3 (done): tunnel reachable, Twilio frames logged,
@@ -64,8 +69,37 @@ DEEPGRAM_URL = (
 twilio_client = Client(ENV["TWILIO_ACCOUNT_SID"], ENV["TWILIO_AUTH_TOKEN"])
 
 ELEVENLABS_API_KEY = ENV.get("ELEVENLABS_API_KEY", "")
-ELEVENLABS_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"  # "Sarah" — confirmed present in this account's own voice list; placeholder for this checkpoint, a persona voice gets picked deliberately in Step 2
-SCRIPTED_REPLY_TEXT = "Hi, I'd like to schedule an appointment please."
+ELEVENLABS_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"  # "Sarah" — confirmed present in this account's own voice list
+
+ANTHROPIC_API_KEY = ENV.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL = "claude-sonnet-5"
+
+# Placeholder persona for this checkpoint (piece 1: prove the LLM call works
+# at all) — a deliberately designed persona + scenario comes in piece 2.
+PATIENT_SYSTEM_PROMPT = (
+    "You are a patient calling Pivot Point Orthopedics to schedule an appointment "
+    "for knee pain. Speak naturally, like a real person on the phone — one or two "
+    "short sentences per turn, no lists, no markdown, no stage directions. Stay in "
+    "character as the patient at all times."
+)
+
+
+def generate_llm_reply(conversation_history):
+    url = "https://api.anthropic.com/v1/messages"
+    headers = {
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": 150,
+        "system": PATIENT_SYSTEM_PROMPT,
+        "messages": conversation_history,
+    }
+    r = requests.post(url, headers=headers, json=payload, timeout=20)
+    r.raise_for_status()
+    return r.json()["content"][0]["text"]
 
 
 def synthesize_speech_ulaw(text):
@@ -190,7 +224,14 @@ async def media_stream(websocket: WebSocket):
                 return
             turn_ended = True
             print(f"[TURN END DETECTED] reason={reason}")
-            await send_tts_reply(SCRIPTED_REPLY_TEXT)
+
+            agent_said = " ".join(t["text"] for t in transcript_turns if t["speaker"] == "agent")
+            conversation_history = [{"role": "user", "content": agent_said}]
+            print(f"[LLM] generating reply to: {agent_said!r}")
+            reply_text = await asyncio.to_thread(generate_llm_reply, conversation_history)
+            print(f"[LLM] reply: {reply_text!r}")
+
+            await send_tts_reply(reply_text)
             print(f"-> hanging up call {call_sid}")
             try:
                 twilio_client.calls(call_sid).update(status="completed")
