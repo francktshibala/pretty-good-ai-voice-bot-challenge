@@ -120,3 +120,13 @@ Ran a real test call — got a real, legible transcript of Pretty Good AI's own 
 **Not yet done:** No turn-detection logic yet (piece 3 — currently the test call is cut off by a fixed 10s timer, not by detecting a natural pause). No TTS reply (piece 4). No transcript saved to disk (piece 5).
 
 ---
+
+## 2026-08-19 — Step 1, piece 3: real turn-detection confirmed
+
+**What happened:** Added `endpointing=300&utterance_end_ms=1000` to the Deepgram connection and had the server react to `speech_final`/`UtteranceEnd` signals by hanging up the call itself via the Twilio REST API — replacing the fixed 10s timer from piece 2 with an actual "the far end stopped talking" signal. Chose to have the server end the call directly (using the `callSid` captured from Twilio's `start` event) rather than have the external test script keep timing/polling — closer to how the real bot will eventually behave, where the pipeline itself reacts to a turn boundary. Rewrote `test_media_stream_call.py` to just poll call status with a 30s safety cap, instead of force-hanging-up on a timer — the cap exists only so a detection bug can't leave a call running indefinitely, not as the primary mechanism.
+
+Ran a real test call: `speech_final` fired immediately after Deepgram's real final transcript (`"This call may be recorded for quality and training purposes."`), and the call ended cleanly at **8.7 seconds** — well under the old fixed 10s cutoff and driven by an actual turn boundary, not a guess. This is the eval's turn-taking requirement (criterion #1, the hard gate) demonstrated directly, not assumed.
+
+**Not yet done:** No TTS reply yet (piece 4 — the call currently just hangs up silently once their agent stops talking, doesn't say anything back). No transcript saved to disk yet (piece 5).
+
+---

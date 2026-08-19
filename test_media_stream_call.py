@@ -1,10 +1,11 @@
 """
-Step 1, piece 2, sub-piece 2: confirm Twilio actually connects to our
-WebSocket and sends real media frames from a real call. No Deepgram yet
-— just proving the wiring works, per ws_echo_test.py's /media-stream
-logging.
+Step 1, piece 3: confirm real turn-detection — the server (ws_echo_test.py)
+now hangs up the call itself once Deepgram signals the far end stopped
+talking, instead of this script cutting it off on a fixed timer.
 
-Auto-hangs-up after ~10s so the test doesn't run indefinitely.
+This script just places the call and polls status until it ends, with a
+safety cap in case detection fails for some reason (so a bug never turns
+into a runaway open call).
 
 Run with: python3 test_media_stream_call.py <ngrok_public_url>
 Example:  python3 test_media_stream_call.py humorous-subheader-exorcism.ngrok-free.dev
@@ -14,6 +15,8 @@ import sys
 import time
 
 from twilio.rest import Client
+
+SAFETY_CAP_SECONDS = 30
 
 
 def load_env(path=".env"):
@@ -55,16 +58,19 @@ def main():
 
     call = client.calls.create(to=to_number, from_=from_number, twiml=twiml)
     print(f"Call placed. SID: {call.sid}")
-    print("Streaming for ~10 seconds, check server log for frame activity...")
+    print(f"Waiting for the server to detect turn-end and hang up (safety cap: {SAFETY_CAP_SECONDS}s)...")
 
-    time.sleep(10)
+    start = time.time()
+    while time.time() - start < SAFETY_CAP_SECONDS:
+        time.sleep(2)
+        call = client.calls(call.sid).fetch()
+        if call.status in ("completed", "canceled", "failed", "busy", "no-answer"):
+            elapsed = round(time.time() - start, 1)
+            print(f"Call ended on its own after {elapsed}s, status: {call.status}")
+            return
 
-    call = client.calls(call.sid).fetch()
-    if call.status not in ("completed", "canceled", "failed", "busy", "no-answer"):
-        client.calls(call.sid).update(status="completed")
-        print("Call ended by script after 10s test window.")
-    else:
-        print(f"Call already ended on its own, status: {call.status}")
+    print(f"Safety cap of {SAFETY_CAP_SECONDS}s hit — turn-detection may not have fired. Hanging up now.")
+    client.calls(call.sid).update(status="completed")
 
 
 if __name__ == "__main__":

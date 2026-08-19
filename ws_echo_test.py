@@ -1,18 +1,17 @@
 """
-Step 1, piece 2: WebSocket server used across three sub-pieces.
+Step 1, piece 2 (streaming audio -> transcription) and piece 3
+(turn-detection), built as one evolving server.
 
-Sub-piece 1 (done): /ws — plain echo test, confirms the ngrok tunnel
-reaches this server from the public internet at all.
+Piece 2, sub-pieces 1-3 (done): tunnel reachable, Twilio frames logged,
+Deepgram live transcription confirmed on a real call.
 
-Sub-piece 2 (done): /media-stream logs Twilio's event envelope and
-frame/byte counts only — no Deepgram yet. Isolated "is Twilio's audio
-actually arriving, and what does it look like" as its own checkpoint.
+Piece 3 (this addition): Deepgram's endpointing/UtteranceEnd signals
+replace the fixed test-script timer as the real "their agent stopped
+talking" signal. On detection, the server itself hangs up the call via
+the Twilio REST API — closer to how the real bot will eventually behave
+(the pipeline reacts to a turn boundary, not an external script).
 
-Sub-piece 3 (this addition): /media-stream now forwards decoded audio
-to Deepgram's streaming API and prints live transcripts. Last checkpoint
-before piece 3 (turn-detection) and piece 4 (TTS reply) build on top.
-
-Run with: python3 -u ws_echo_test.py   (unbuffered — see sub-piece 2 log
+Run with: python3 -u ws_echo_test.py   (unbuffered — see piece 2 log
 entry for why this matters)
 Then, in another terminal: ngrok http 8000
 """
@@ -23,6 +22,7 @@ import json
 
 import websockets
 from fastapi import FastAPI, WebSocket
+from twilio.rest import Client
 
 app = FastAPI()
 
@@ -44,7 +44,10 @@ DEEPGRAM_API_KEY = ENV.get("DEEPGRAM_API_KEY", "")
 DEEPGRAM_URL = (
     "wss://api.deepgram.com/v1/listen"
     "?encoding=mulaw&sample_rate=8000&channels=1&punctuate=true&interim_results=true"
+    "&endpointing=300&utterance_end_ms=1000"
 )
+
+twilio_client = Client(ENV["TWILIO_ACCOUNT_SID"], ENV["TWILIO_AUTH_TOKEN"])
 
 
 @app.get("/")
@@ -71,6 +74,8 @@ async def media_stream(websocket: WebSocket):
     print("Twilio media stream connected")
 
     frame_count = 0
+    call_sid = None
+    turn_ended = False
 
     async with websockets.connect(
         DEEPGRAM_URL,
@@ -78,8 +83,19 @@ async def media_stream(websocket: WebSocket):
     ) as dg_ws:
         print("Connected to Deepgram streaming API")
 
+        async def end_call(reason):
+            nonlocal turn_ended
+            if turn_ended or not call_sid:
+                return
+            turn_ended = True
+            print(f"[TURN END DETECTED] reason={reason} -> hanging up call {call_sid}")
+            try:
+                twilio_client.calls(call_sid).update(status="completed")
+            except Exception as e:
+                print(f"Failed to hang up call (may have already ended): {e}")
+
         async def twilio_to_deepgram():
-            nonlocal frame_count
+            nonlocal frame_count, call_sid
             try:
                 while True:
                     raw = await websocket.receive_text()
@@ -91,8 +107,9 @@ async def media_stream(websocket: WebSocket):
 
                     elif event == "start":
                         start = msg.get("start", {})
+                        call_sid = start.get("callSid")
                         print(
-                            f"[start] callSid={start.get('callSid')} "
+                            f"[start] callSid={call_sid} "
                             f"mediaFormat={start.get('mediaFormat')}"
                         )
 
@@ -114,11 +131,21 @@ async def media_stream(websocket: WebSocket):
             try:
                 async for message in dg_ws:
                     data = json.loads(message)
+                    msg_type = data.get("type")
+
+                    if msg_type == "UtteranceEnd":
+                        await end_call("UtteranceEnd")
+                        continue
+
                     alternatives = data.get("channel", {}).get("alternatives", [{}])
                     transcript = alternatives[0].get("transcript", "")
                     if transcript:
                         tag = "FINAL" if data.get("is_final") else "interim"
                         print(f"[{tag}] {transcript}")
+
+                    if data.get("speech_final"):
+                        await end_call("speech_final")
+
             except Exception as e:
                 print(f"Deepgram side closed: {e}")
 
