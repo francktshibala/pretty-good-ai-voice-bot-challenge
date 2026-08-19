@@ -323,3 +323,19 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Not yet done:** 7 of 12 calls remain (6 through 12).
 
 ---
+
+## 2026-08-19 — Step 4, call 6 (ambiguous availability): refines the dead-end-transfer finding, "Maria" bug confirmed a 4th time
+
+**Call 6 (Tom Whitfield, deliberately vague availability) — 142.1s, 11 turns, ended by the far end (`remote_stop`), not our own logic.**
+
+**"Maria" caching bug, 4th occurrence:** *"Am I speaking with Maria?"* again, despite Tom never being Maria — same pattern as calls 2, 3, and 4.
+
+**Major update to the dead-end-transfer finding from calls 2/3/6:** this call's identity verification actually *succeeded* — name, DOB, and phone were all confirmed correctly, no record-lookup failure this time. But the moment the persona gave its (deliberately vague) availability — *"Tuesday or Wednesday, whichever works best, I'm pretty flexible"* — their agent immediately transferred to the same dead-end fallback line seen before (*"Hello. You've reached the pretty good Ai test line. Goodbye."*), without ever acknowledging the scheduling request or asking a clarifying question. **This means the dead-end transfer is not specifically caused by record-lookup failure as calls 2/3 suggested — it appears to be a broader breakdown, possibly triggered whenever the conversation reaches actual appointment-time negotiation, independent of whether identity was successfully verified.** Revises rather than just repeats the earlier theory — worth stating this evolution explicitly in the report rather than presenting the original narrower theory as final.
+
+**Bot behavior worth noting:** after landing on the dead-end line, the persona correctly recognized something was wrong and pushed back naturally — *"Uh, I'm still here to schedule an appointment. Can I get transferred back?"* — good example of the persona staying in character and reacting sensibly to an unexpected system failure, rather than just complying silently.
+
+**Scenario's original goal only partially achieved:** the deliberate test of category 6 (does the agent ask a good clarifying question on vague availability) never got a real answer — the transfer preempted it before the agent had a chance to respond to the ambiguous input at all. Worth considering a repeat of this scenario later if time allows, now that the transfer-timing pattern is better understood.
+
+**Not yet done:** 6 of 12 calls remain (7 through 12).
+
+---
