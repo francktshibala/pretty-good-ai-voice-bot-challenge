@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Step 1 walking-skeleton test call artifacts (not deliverable calls — those
+# get their own directory in Step 4)
+call_logs/

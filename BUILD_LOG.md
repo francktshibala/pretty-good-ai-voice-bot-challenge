@@ -142,3 +142,28 @@ Reran the test call end-to-end: real transcript captured, `speech_final` fired, 
 **Not yet done:** No transcript/recording saved to disk yet as deliverable-format artifacts (piece 5, the last piece of Step 1) — this run proved the loop closes but didn't persist anything to disk yet.
 
 ---
+
+## 2026-08-19 — Step 1, piece 5: transcript + recording saved to disk
+
+**What happened:** Added `save_transcript()` (writes a JSON file with both speakers' turns, `agent` from Deepgram finals and `bot` from the scripted reply text) and `download_recording()` (polls Twilio for the call's recording and downloads the mp3) to `call_logs/`, both triggered right after hangup in `end_call()`. Turned on `record=True` on the call itself in `test_media_stream_call.py`, which hadn't been set since piece 2.
+
+**Bug hit and fixed:** First run saved the transcript correctly but the recording download failed with `404 Not Found`, even though `recordings.list()` had already returned a recording object. Root cause: the recording *resource* existing doesn't mean its *media* is ready — Twilio recordings go through a brief `processing` state before `completed`, and the original retry logic only re-polled when the recordings list was empty, not when a recording existed but wasn't finished yet. Confirmed by fetching the same recording directly a few minutes later — it was `status: completed` by then. Fixed by checking `recording.status == "completed"` before attempting the download, and wrapping the download itself in its own retry rather than treating one failed attempt as final. Verified the fix directly against the earlier call's now-completed recording (26,018 bytes, confirmed as a real MPEG audio file via `file`) before restarting the live server with the corrected code.
+
+**This closes out Step 1 entirely.** All five pieces are done: real call + recording, streaming transcription, real turn-detection, a closed conversational loop, and both deliverable artifacts (audio + matching transcript) saved to disk automatically per call. The walking skeleton the plan called for is fully proven on real calls, not assumed.
+
+**Verified clean:** Ran one more real call through the restarted server. Log shows `[waiting] recording status=processing` — the fix's polling actually engaging, not just passing by luck — followed by both `..._transcript.json` and `....mp3` (24,973 bytes) saved automatically with zero manual steps. Step 1 is closed with no loose ends.
+
+---
+
+## Step 1 summary
+
+All five pieces done and proven on real calls, not assumed:
+1. Real outbound call + recording
+2. Streaming audio → live Deepgram transcription
+3. Real turn-detection (Deepgram endpointing), not a fixed timer
+4. Scripted ElevenLabs reply closes the full conversational loop
+5. Transcript (JSON) + recording (mp3) saved to disk automatically per call
+
+Three real bugs were hit and fixed along the way (stdout buffering hiding logs, an invalid ElevenLabs voice ID misread as a billing restriction, and a recording-resource-exists-but-media-not-ready race condition) — each is a genuine debugging example for the video walkthrough, not staged. Next: Step 2, swapping the scripted reply for real LLM reasoning with a patient persona.
+
+---

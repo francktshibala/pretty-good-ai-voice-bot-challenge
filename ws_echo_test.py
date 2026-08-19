@@ -7,12 +7,16 @@ Deepgram live transcription confirmed on a real call.
 Piece 3 (done): Deepgram's endpointing/UtteranceEnd signals replace the
 fixed test-script timer as the real "their agent stopped talking" signal.
 
-Piece 4 (this addition): on turn-end, synthesize a scripted line via
-ElevenLabs (not real LLM reasoning yet — proving the loop closes end to
-end is the point of this piece, per the plan's walking-skeleton step),
-stream it back to Twilio over the same bidirectional connection, then
-hang up. Closes the full loop: call -> transcribe -> detect turn ->
-speak back -> end.
+Piece 4 (done): on turn-end, synthesize a scripted line via ElevenLabs
+(not real LLM reasoning yet — proving the loop closes end to end is the
+point of this piece, per the plan's walking-skeleton step), stream it
+back to Twilio over the same bidirectional connection, then hang up.
+Closes the full loop: call -> transcribe -> detect turn -> speak back ->
+end.
+
+Piece 5 (this addition, last piece of Step 1): save a transcript (JSON,
+both speakers) and download the call recording (mp3) to call_logs/ once
+the call ends — two of the actual deliverables depend on this working.
 
 Run with: python3 -u ws_echo_test.py   (unbuffered — see piece 2 log
 entry for why this matters)
@@ -22,6 +26,9 @@ Then, in another terminal: ngrok http 8000
 import asyncio
 import base64
 import json
+import os
+import time
+from datetime import datetime, timezone
 
 import requests
 import websockets
@@ -29,6 +36,9 @@ from fastapi import FastAPI, WebSocket
 from twilio.rest import Client
 
 app = FastAPI()
+
+CALL_LOGS_DIR = "call_logs"
+os.makedirs(CALL_LOGS_DIR, exist_ok=True)
 
 
 def load_env(path=".env"):
@@ -69,6 +79,53 @@ def synthesize_speech_ulaw(text):
     return r.content
 
 
+def save_transcript(call_sid, turns):
+    path = os.path.join(CALL_LOGS_DIR, f"{call_sid}_transcript.json")
+    record = {
+        "call_sid": call_sid,
+        "saved_at": datetime.now(timezone.utc).isoformat(),
+        "turns": turns,
+    }
+    with open(path, "w") as f:
+        json.dump(record, f, indent=2)
+    print(f"[SAVED] transcript -> {path}")
+
+
+def download_recording(call_sid, max_wait_seconds=30, poll_interval=3):
+    """Recordings aren't available the instant a call ends, and the resource
+    can exist before its media is actually ready (a first attempt hit a 404
+    on the .mp3 even though recordings.list() already returned it) — poll on
+    status=="completed" specifically, and retry the download itself too."""
+    waited = 0
+    while waited < max_wait_seconds:
+        recordings = twilio_client.recordings.list(call_sid=call_sid)
+        if recordings and recordings[0].status == "completed":
+            recording = recordings[0]
+            media_url = (
+                f"https://api.twilio.com/2010-04-01/Accounts/{ENV['TWILIO_ACCOUNT_SID']}"
+                f"/Recordings/{recording.sid}.mp3"
+            )
+            try:
+                r = requests.get(
+                    media_url,
+                    auth=(ENV["TWILIO_ACCOUNT_SID"], ENV["TWILIO_AUTH_TOKEN"]),
+                    timeout=30,
+                )
+                r.raise_for_status()
+                path = os.path.join(CALL_LOGS_DIR, f"{call_sid}.mp3")
+                with open(path, "wb") as f:
+                    f.write(r.content)
+                print(f"[SAVED] recording -> {path} ({len(r.content)} bytes)")
+                return
+            except requests.RequestException as e:
+                print(f"[WARN] recording marked completed but download failed, retrying: {e}")
+        elif recordings:
+            print(f"[waiting] recording status={recordings[0].status}")
+        time.sleep(poll_interval)
+        waited += poll_interval
+    print(f"[WARN] no completed recording found for {call_sid} after {max_wait_seconds}s")
+
+
 @app.get("/")
 def health():
     return {"status": "ok"}
@@ -96,6 +153,7 @@ async def media_stream(websocket: WebSocket):
     call_sid = None
     stream_sid = None
     turn_ended = False
+    transcript_turns = []
 
     async with websockets.connect(
         DEEPGRAM_URL,
@@ -108,6 +166,7 @@ async def media_stream(websocket: WebSocket):
                 print("[TTS] no streamSid yet, skipping reply")
                 return
             print(f"[TTS] synthesizing: {text!r}")
+            transcript_turns.append({"speaker": "bot", "text": text})
             audio_bytes = synthesize_speech_ulaw(text)
             print(f"[TTS] got {len(audio_bytes)} bytes of mulaw audio, sending to Twilio")
 
@@ -137,6 +196,9 @@ async def media_stream(websocket: WebSocket):
                 twilio_client.calls(call_sid).update(status="completed")
             except Exception as e:
                 print(f"Failed to hang up call (may have already ended): {e}")
+
+            save_transcript(call_sid, transcript_turns)
+            await asyncio.to_thread(download_recording, call_sid)
 
         async def twilio_to_deepgram():
             nonlocal frame_count, call_sid, stream_sid
@@ -187,6 +249,8 @@ async def media_stream(websocket: WebSocket):
                     if transcript:
                         tag = "FINAL" if data.get("is_final") else "interim"
                         print(f"[{tag}] {transcript}")
+                        if data.get("is_final"):
+                            transcript_turns.append({"speaker": "agent", "text": transcript})
 
                     if data.get("speech_final"):
                         await end_call("speech_final")

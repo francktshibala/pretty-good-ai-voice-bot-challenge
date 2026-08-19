@@ -56,7 +56,7 @@ def main():
         "</Response>"
     )
 
-    call = client.calls.create(to=to_number, from_=from_number, twiml=twiml)
+    call = client.calls.create(to=to_number, from_=from_number, twiml=twiml, record=True)
     print(f"Call placed. SID: {call.sid}")
     print(f"Waiting for the server to detect turn-end and hang up (safety cap: {SAFETY_CAP_SECONDS}s)...")
 
