@@ -195,3 +195,18 @@ Also fixed a real gap while building this: if the clinic's agent hangs up *first
 **Not yet done:** Step 3 (deliberately defining bug categories before the real calls) hasn't happened yet — this run's bug findings were incidental. Step 4's real 10+ calls haven't started.
 
 ---
+
+## 2026-08-19 — Step 2, piece 2 (continued): caps raised, 16-turn conversation confirms the mechanism is solid
+
+**What happened:** Raised `MAX_TURNS` from 8 to 16 and `MAX_CALL_SECONDS` from 90 to 180 (and the external test script's own safety cap from 120 to 210, to stay above the server's cap) after the previous run showed 8 turns cut a real scheduling flow off mid-way. Reran the test call.
+
+**Result: 16 turns, 147s, genuinely coherent throughout.** The conversation progressed naturally through the real scheduling flow — patient info, urgency triage ("is this urgent or a routine checkup?"), provider preference ("open to first available"), into actual date negotiation ("the soonest afternoon openings are this Thursday, August twentieth... would you like to hear the available times?"). Still hit the `MAX_TURNS` cap right before finishing, but this confirms the mechanism sustains long, on-topic, natural conversations — directly demonstrating the eval's hard gate (criterion #1: coherent voice conversation, sensible turn-taking) rather than assuming it from a short run.
+
+**More findings, with an important attribution caveat:**
+- **Real bug, repeated dropped audio:** turns 5 and 6 both came through as incomplete fragments — *"Please provide your"* then *"Please provide"* — before the agent's question (asking for date of birth) finally came through intact on the third attempt. Their system's audio cut off mid-sentence twice in a row, not a one-off.
+- **Non-reproduction, worth noting for severity/priority in the bug report:** the fabricated-DOB bug from the previous run did *not* happen this time — the agent correctly echoed back the real DOB (March 14, 1990) when given. Suggests the earlier bug may be intermittent or dependent on which flow branch the conversation takes, not a guaranteed repro.
+- **Attribution caution, not yet resolved:** one transcript line reads *"As soon afternoon openings are this Thursday"* — garbled, but this may well be **our own Deepgram mis-transcribing** their agent's actual audio (plausibly "The soonest afternoon openings...") rather than their system genuinely saying something broken. Before writing anything like this into the final bug report, it needs checking against the actual recording audio — don't want to misattribute our own STT noise as their system's bug.
+
+**Step 2 is now considered solid.** The mechanism handles real, extended, coherent conversations reliably. Further raising the turn cap on this same test scenario has diminishing returns — better to save "let it fully complete" effort for the actual Step 4 deliverable calls, where finishing naturally matters for call quality, not just mechanism-proving. Next: Step 3, deliberately defining bug categories before the real 10+ calls (rather than continuing to find bugs incidentally).
+
+---

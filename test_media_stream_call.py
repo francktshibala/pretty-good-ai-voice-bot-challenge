@@ -16,7 +16,7 @@ import time
 
 from twilio.rest import Client
 
-SAFETY_CAP_SECONDS = 120  # above the server's own MAX_CALL_SECONDS (90s) so it doesn't cut a real multi-turn conversation short
+SAFETY_CAP_SECONDS = 210  # above the server's own MAX_CALL_SECONDS (180s) so it doesn't cut a real multi-turn conversation short
 
 
 def load_env(path=".env"):

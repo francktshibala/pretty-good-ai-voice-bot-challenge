@@ -82,8 +82,8 @@ ELEVENLABS_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"  # "Sarah" — confirmed present in
 OPENAI_API_KEY = ENV.get("OPENAI_API_KEY", "")
 OPENAI_MODEL = "gpt-4o-mini"  # switched from Anthropic mid-Step 2 — ran out of Anthropic credits
 
-MAX_TURNS = 8
-MAX_CALL_SECONDS = 90
+MAX_TURNS = 16  # 8 wasn't enough to reach a natural conclusion in the first real multi-turn test
+MAX_CALL_SECONDS = 180
 
 PATIENT_SYSTEM_PROMPT = (
     "You are Maria Gonzalez, calling Pivot Point Orthopedics as a new patient. "
