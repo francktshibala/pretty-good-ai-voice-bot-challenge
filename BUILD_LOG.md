@@ -311,3 +311,15 @@ This is a stronger, more clear-cut finding than anything found so far — repeat
 **Not yet done:** 8 of 12 calls remain (5 through 12).
 
 ---
+
+## 2026-08-19 — Step 4, call 5 (hours/insurance): clean result, no bugs found
+
+**Call 5 (Angela Torres, factual hours/insurance questions, no scheduling intent) — 53.9s, 5 turns, clean natural [END_CALL].**
+
+Both questions got direct, correct-sounding answers: "open Monday through Friday, not Saturdays" and "yes, we accept most insurance plans, including Blue Cross Blue Shield." No dropped audio, no misheard input, no identity-lookup step at all this time (consistent with the theory that the "Maria" caching bug is tied specifically to identity-verification steps — this call never triggered one, and the bug didn't appear).
+
+**Documented as a clean result deliberately** — not every call needs to surface a bug; recording this honestly matters for the report's credibility (shows real testing, not cherry-picked failures).
+
+**Not yet done:** 7 of 12 calls remain (6 through 12).
+
+---
