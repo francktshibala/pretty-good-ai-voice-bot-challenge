@@ -353,3 +353,17 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Not yet done:** 5 of 12 calls remain (8 through 12).
 
 ---
+
+## 2026-08-19 — Step 4, call 8 (repeated/looping probe): positive result for category 3, second full successful booking
+
+**Call 8 (Kevin Park, deliberate mumbled/repeat-request answers) — 148.6s, 14 turns, clean natural [END_CALL].**
+
+**Positive finding for category 3:** the persona asked *"can you say that again?"* five separate times across the call (turns 2, 5, 7, 9, 11) — their agent never got stuck looping or repeating itself incorrectly; it just kept moving the conversation forward each time. **The call completed a full, successful booking** (tomorrow at 10am with Dr. Lu) — the second fully successful natural-ending booking so far (after call 1). Worth documenting plainly: this category did not reproduce a bug, the system handled repeated clarification requests reasonably well.
+
+**"Maria" bug, 6th occurrence:** *"Speaking with Maria."* — now present in nearly every call that reaches an identity-verification step. This is one of the best-evidenced findings in the whole test set at this point.
+
+**Recurring, not yet resolved:** doctor names continue coming through garbled almost every call ("doctors as a big new Lu," "doctors of being you Le," "doctors Zen new la") and the "please provide your ___" truncated-audio pattern (category 7) appeared again. Frequency across many calls now makes both patterns hard to dismiss as one-off noise, but per the standing attribution-discipline rule, still need audio verification before asserting these are their system's fault rather than our own Deepgram's.
+
+**Not yet done:** 4 of 12 calls remain (9 through 12).
+
+---
