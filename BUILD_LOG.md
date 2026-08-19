@@ -274,3 +274,11 @@ This is a stronger, more clear-cut finding than anything found so far — repeat
 **Not yet done:** 10 of 12 calls remain (3 through 12).
 
 ---
+
+## 2026-08-19 — Call 3 attempt failed: ngrok tunnel instability, not a bot or target-system bug
+
+**What happened:** Call 3 (`03_reschedule_vague`) ended after 1 second per Twilio's own call record (`duration: 1`), with Twilio notification code 31920 (Media Stream connection failure) — our server never logged a `start` event at all, meaning the WebSocket handshake to the ngrok tunnel never completed. Checked ngrok's own log: the tunnel session has been dropping and reconnecting periodically throughout this dev session (`"session closed, starting reconnect loop"`, `"heartbeat timeout, terminating session"`), most recently right around when call 3 was placed. This is a free-tier ngrok reliability issue — not a bug in our bot logic, and not a finding about Pretty Good AI's system; it just needs distinguishing from real findings before it ends up misattributed in the report.
+
+**Decision:** Confirmed the tunnel and server are healthy again (direct health check + ngrok API check both passed) and retried call 3 rather than switching infrastructure mid-Step-4. If this recurs, worth reconsidering a more stable tunnel (paid ngrok, or deploying the server somewhere persistent) rather than continuing to retry through it.
+
+---
