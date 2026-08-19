@@ -339,3 +339,17 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Not yet done:** 6 of 12 calls remain (7 through 12).
 
 ---
+
+## 2026-08-19 — Step 4, call 7 (barge-in, opening): confirms interrupt mechanism again, surfaces a bug in our own bot
+
+**Call 7 (Elena Vasquez, barge-in at opening) — 178.7s, 16 turns, hit MAX_TURNS cap right at final confirmation.**
+
+**Barge-in confirmed again:** fired at 1.1s, mid "This call may be" — same as the earlier mechanism-proving call, their disclosure line completed unaffected by being talked over. Consistent finding across two separate real calls now, not a one-off.
+
+**"Maria" bug, 5th occurrence — and this time it compounds with a real flaw in our own bot, not theirs:** the agent said *"I speaking with Maria"* (STT dropped the "Am," turning it from a question into more of a statement), and Elena's persona **went along with it** — *"Hi Maria, yes, that's me."* — rather than correcting the misidentification the way David's persona did in call 2 ("No, this is David Nkemelu"). This is a real inconsistency in our own persona prompting depending on how the mis-ID gets phrased, worth being honest about in the architecture doc rather than only reporting bugs on their side.
+
+**Otherwise a strong, realistic negotiation:** agent repeatedly offered only daytime slots (10am, 3:30pm), persona kept pushing for evening availability across several rounds, eventually compromised on 3:30pm after the agent confirmed no evening slots existed that week or the next — coherent, natural back-and-forth on both sides, not scripted-feeling. Hit `MAX_TURNS=16` right at final confirmation (*"Just to confirm,"* cut off mid-sentence) — now several calls in a row where complex scheduling negotiations run right up against the cap. Doctor names keep coming through garbled ("doctor Z being Le," "doctor Lu or doctor Kelly Noble") — a recurring pattern across multiple calls now, not isolated.
+
+**Not yet done:** 5 of 12 calls remain (8 through 12).
+
+---
