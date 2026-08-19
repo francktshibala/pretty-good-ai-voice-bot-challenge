@@ -407,3 +407,17 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Not yet done:** 1 of 12 calls remains (12, the mid-conversation barge-in follow-up).
 
 ---
+
+## 2026-08-19 — Step 4, call 12 (barge-in mid-conversation): interruption finding generalizes, and the most serious bug of the project
+
+**Call 12 (Carlos Ibarra, mid-conversation barge-in) — 119.6s, 8 turns, clean natural [END_CALL]. Final call of the 12.**
+
+**Barge-in confirmed during genuine dynamic speech, not just the fixed opening disclosure:** fired at 26.0s, mid-sentence ("I see your call"), during real dynamic agent speech rather than the compliance message that calls 7's interruption landed on. Their agent again continued through with no pause, acknowledgment, or reaction to being talked over — the same non-reactive pattern now confirmed at two structurally different points in a call. This generalizes the interruption-handling finding rather than leaving open the possibility it was specific to a non-interruptible fixed message.
+
+**The single most serious finding of the project:** Carlos — a persona that has never called before anywhere in this test set — was told *"You already have an acute appointment booked for Thursday, August twentieth at one thirty PM."* That is the exact date and time of the appointment booked for a completely different persona in call 1 (Maria Gonzalez, also "Thursday, August 20th, 1:30 PM"). This strongly suggests the system is returning another patient's real appointment data to the wrong caller — not a UX inconvenience like the dead-end transfers, but an actual patient-data mixup. Given the project's purpose is finding real, reportable issues, this is likely the top-priority item for the bug report, arguably more serious in kind than the dead-end-transfer pattern even though it was observed once rather than five times — a single data-integrity bug like this outweighs a frequent-but-cosmetic one.
+
+**Running tally after all 12 calls:** 3 calls reached genuine task completion (1, 8, 12 — though 12's "completion" is itself the bug, confirming someone else's appointment) vs. 5 dead-end transfers (2, 3, 6, 9, 11) vs. 4 calls with other outcomes (4, 5, 7, 10 — clean/partial results, one strong positive safety finding). "Maria" caching bug appeared in 7 of 12 calls. Doctor names came through garbled in the majority of calls involving scheduling. Barge-in confirmed twice independently. One real flaw found in our own bot's persona design (call 11's excessive rambling).
+
+**Step 4's 12 real calls are complete.** Next: Step 5 (iterate — review what changed across rounds, already substantially documented in this log) and Step 6 (deliverables: architecture doc, bug report, Loom videos, submission).
+
+---
