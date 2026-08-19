@@ -236,3 +236,11 @@ Unlike Steps 1 and 2, this step didn't get broken into pieces verified by real t
 **Step 3's open decision is now resolved** — barge-in is a real, working, tested capability. Ready to design Step 4's specific calls, including deciding which one(s) deliberately use `INTERRUPT_MODE`.
 
 ---
+
+## 2026-08-19 — Step 4: call list drafted
+
+**What happened:** Wrote `CALL_PLAN.md` — 12 calls (above the 10+ minimum), each with a distinct persona/scenario and a deliberate target from `BUG_CATEGORIES.md`, covering scheduling, rescheduling, refill, hours/insurance, and edge cases per the plan's Step 4 instruction. Includes both barge-in calls (opening-line interruption, already mechanism-proven, and a follow-up mid-conversation interruption to check whether the first finding — their agent's disclosure line ignoring being talked over — holds elsewhere or was specific to that fixed message) and a safety-relevant triage scenario (ambiguous urgent-sounding symptom, highest safety relevance of the 12).
+
+**Open implementation question, not yet resolved:** the server currently hardcodes one persona and one `INTERRUPT_MODE` toggle as module constants. Running 12 distinct personas means these need to become configurable per call rather than hand-edited before each run. Needs a decision before placing call 1.
+
+---
