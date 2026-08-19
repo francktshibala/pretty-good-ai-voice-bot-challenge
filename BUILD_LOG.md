@@ -177,3 +177,21 @@ Ran a real test call: the LLM produced a genuinely natural, in-character reply �
 **Not yet done:** Still single-exchange — the call ends after one reply rather than continuing to listen for the clinic agent's actual response. Piece 2 (next): make the conversation continue across multiple turns until a natural end, with a deliberately designed persona and scenario goal instead of the placeholder prompt.
 
 ---
+
+## 2026-08-19 — Step 2, piece 2: multi-turn conversation confirmed, first real bug found
+
+**What happened:** Rebuilt the turn-handling logic to keep the conversation going instead of hanging up after one reply. `conversation_history` now accumulates as proper alternating `user`/`assistant` messages; a `handle_turn_end()` function replaces the old single-shot `end_call()`, deciding per turn whether to keep going or hang up. Two independent safety caps guard against runaway conversations: `MAX_TURNS=8` and `MAX_CALL_SECONDS=90` — same reasoning as flagging Twilio's auto-recharge earlier, a misbehaving LLM or agent loop should never turn into an open-ended call. The model can also end the call itself by including a literal `[END_CALL]` marker in its final reply once the scenario concludes naturally (stripped before TTS). Replaced the placeholder persona with a real one: Maria Gonzalez, new patient, knee pain after a hiking trip, specific DOB and phone number, available weekday afternoons.
+
+Also fixed a real gap while building this: if the clinic's agent hangs up *first* (before our own turn-end/safety-cap logic triggers), Twilio's `stop` event previously just broke the loop with nothing saved. Added an explicit `hang_up("remote_stop")` call on that path so a call ending from the other side still saves its transcript and recording — this was a real correctness gap, not just clean-up.
+
+**Provider swap, mid-piece:** Anthropic credits ran out before this could be tested. Switched `generate_llm_reply` to OpenAI (`gpt-4o-mini`) instead — the account's `OPENAI_API_KEY` was already confirmed working back in Step 0's `verify_setup.py`, and the conversation-history format needed no changes since both APIs use the same `role`/`content` message shape.
+
+**Ran a real test call — full 8-turn conversation, 95.1s total.** The turn-detection double-fire guard worked as designed (many `"no new agent speech, ignoring"` lines — `speech_final` and `UtteranceEnd` both firing for the same pause, handled without a duplicate LLM call). The conversation hit `MAX_TURNS=8` before reaching a natural `[END_CALL]` — the scheduling flow was still mid-way (agent asking about provider preference) when the safety cap ended it. Both transcript and a 349,936-byte recording saved correctly, including through the multi-turn path.
+
+**Real bug found in Pretty Good AI's system, unprompted:** at turn 7, their agent said *"Your patient profile is set up, and your date of birth is July fourth two thousand for demo purposes"* — Maria never gave that date; her actual persona DOB (March 14, 1990) was stated earlier in the call. The agent fabricated a DOB rather than using what was actually said. Also caught: the agent misheard "Maria" as "Marie" earlier in the same call. Both are genuine, unstaged findings for the bug report — found while proving the mechanism works, not from a dedicated bug hunt (that's Step 3/4).
+
+**Decision, carried into Step 4 planning:** 8 turns wasn't enough to reach a natural scheduling completion in this run — worth raising `MAX_TURNS`/`MAX_CALL_SECONDS` for the real deliverable calls so genuine conversations aren't artificially truncated by the safety cap before they'd naturally end.
+
+**Not yet done:** Step 3 (deliberately defining bug categories before the real calls) hasn't happened yet — this run's bug findings were incidental. Step 4's real 10+ calls haven't started.
+
+---

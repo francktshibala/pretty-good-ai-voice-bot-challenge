@@ -1,8 +1,16 @@
 """
-Step 2, piece 1: real LLM reasoning replaces the scripted reply — still a
-single exchange (reply once, hang up) to isolate "does the LLM call work
-inside this pipeline" before piece 2 builds the harder part: a continuing
-multi-turn conversation with a real patient persona.
+Step 2, piece 1 (done): real LLM reasoning replaces the scripted reply —
+proved the LLM call works inside this pipeline with a single exchange
+before piece 2 (below) builds the harder part.
+
+Step 2, piece 2 (this addition): the conversation now continues across
+multiple turns instead of ending after one reply. A real patient persona
++ scenario goal (scheduling for knee pain) drives it, with the model
+signaling a natural end via a literal "[END_CALL]" marker in its final
+reply. Two safety caps exist independently of that signal — max turn
+count and max call duration — so a misbehaving LLM or agent loop can
+never turn into a runaway call, same reasoning as the Twilio auto-recharge
+discussion earlier in this log.
 
 Step 1, pieces 2-4, built as one evolving server.
 
@@ -71,35 +79,43 @@ twilio_client = Client(ENV["TWILIO_ACCOUNT_SID"], ENV["TWILIO_AUTH_TOKEN"])
 ELEVENLABS_API_KEY = ENV.get("ELEVENLABS_API_KEY", "")
 ELEVENLABS_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"  # "Sarah" — confirmed present in this account's own voice list
 
-ANTHROPIC_API_KEY = ENV.get("ANTHROPIC_API_KEY", "")
-ANTHROPIC_MODEL = "claude-sonnet-5"
+OPENAI_API_KEY = ENV.get("OPENAI_API_KEY", "")
+OPENAI_MODEL = "gpt-4o-mini"  # switched from Anthropic mid-Step 2 — ran out of Anthropic credits
 
-# Placeholder persona for this checkpoint (piece 1: prove the LLM call works
-# at all) — a deliberately designed persona + scenario comes in piece 2.
+MAX_TURNS = 8
+MAX_CALL_SECONDS = 90
+
 PATIENT_SYSTEM_PROMPT = (
-    "You are a patient calling Pivot Point Orthopedics to schedule an appointment "
-    "for knee pain. Speak naturally, like a real person on the phone — one or two "
-    "short sentences per turn, no lists, no markdown, no stage directions. Stay in "
-    "character as the patient at all times."
+    "You are Maria Gonzalez, calling Pivot Point Orthopedics as a new patient. "
+    "You've had knee pain for about two weeks after a hiking trip and want to "
+    "schedule an appointment to get it checked out. You're available weekday "
+    "afternoons. Your date of birth is March 14, 1990, and your phone number is "
+    "555-201-4477. Speak naturally and briefly, like a real person on the phone — "
+    "one or two sentences per turn, no lists, no markdown, no stage directions, "
+    "don't repeat yourself. Answer the receptionist's questions directly and stay "
+    "in character as the patient throughout. Once your appointment is confirmed, "
+    "or the call reaches a natural conclusion (e.g. they take a message or say "
+    "they'll call back), thank them, say goodbye, and end your final reply with "
+    "the exact text [END_CALL] on its own line — do not use that marker at any "
+    "other time."
 )
 
 
 def generate_llm_reply(conversation_history):
-    url = "https://api.anthropic.com/v1/messages"
+    url = "https://api.openai.com/v1/chat/completions"
     headers = {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        "Authorization": f"Bearer {OPENAI_API_KEY}",
         "Content-Type": "application/json",
     }
+    messages = [{"role": "system", "content": PATIENT_SYSTEM_PROMPT}] + conversation_history
     payload = {
-        "model": ANTHROPIC_MODEL,
+        "model": OPENAI_MODEL,
         "max_tokens": 150,
-        "system": PATIENT_SYSTEM_PROMPT,
-        "messages": conversation_history,
+        "messages": messages,
     }
     r = requests.post(url, headers=headers, json=payload, timeout=20)
     r.raise_for_status()
-    return r.json()["content"][0]["text"]
+    return r.json()["choices"][0]["message"]["content"]
 
 
 def synthesize_speech_ulaw(text):
@@ -186,8 +202,12 @@ async def media_stream(websocket: WebSocket):
     frame_count = 0
     call_sid = None
     stream_sid = None
-    turn_ended = False
+    call_over = False
+    call_start = time.time()
     transcript_turns = []
+    conversation_history = []
+    agent_buffer = []
+    turn_count = 0
 
     async with websockets.connect(
         DEEPGRAM_URL,
@@ -218,21 +238,12 @@ async def media_stream(websocket: WebSocket):
             print(f"[TTS] all frames sent, waiting ~{playback_seconds:.1f}s for playback")
             await asyncio.sleep(playback_seconds + 0.5)
 
-        async def end_call(reason):
-            nonlocal turn_ended
-            if turn_ended or not call_sid:
+        async def hang_up(reason):
+            nonlocal call_over
+            if call_over or not call_sid:
                 return
-            turn_ended = True
-            print(f"[TURN END DETECTED] reason={reason}")
-
-            agent_said = " ".join(t["text"] for t in transcript_turns if t["speaker"] == "agent")
-            conversation_history = [{"role": "user", "content": agent_said}]
-            print(f"[LLM] generating reply to: {agent_said!r}")
-            reply_text = await asyncio.to_thread(generate_llm_reply, conversation_history)
-            print(f"[LLM] reply: {reply_text!r}")
-
-            await send_tts_reply(reply_text)
-            print(f"-> hanging up call {call_sid}")
+            call_over = True
+            print(f"[HANGUP] reason={reason} -> ending call {call_sid}")
             try:
                 twilio_client.calls(call_sid).update(status="completed")
             except Exception as e:
@@ -240,6 +251,47 @@ async def media_stream(websocket: WebSocket):
 
             save_transcript(call_sid, transcript_turns)
             await asyncio.to_thread(download_recording, call_sid)
+
+        async def handle_turn_end(reason):
+            nonlocal turn_count
+            if call_over:
+                return
+
+            agent_text = " ".join(agent_buffer).strip()
+            agent_buffer.clear()
+            if not agent_text:
+                # Both speech_final and UtteranceEnd can fire for the same pause;
+                # whichever processes first empties the buffer, so the second
+                # is a no-op rather than a duplicate LLM call for one turn.
+                print(f"[TURN END] reason={reason} but no new agent speech, ignoring")
+                return
+
+            print(f"[TURN END DETECTED] reason={reason}: {agent_text!r}")
+            conversation_history.append({"role": "user", "content": agent_text})
+            turn_count += 1
+
+            elapsed = time.time() - call_start
+            if turn_count > MAX_TURNS:
+                print(f"[SAFETY CAP] max turns ({MAX_TURNS}) reached, ending without another reply")
+                await hang_up("max_turns_reached")
+                return
+            if elapsed > MAX_CALL_SECONDS:
+                print(f"[SAFETY CAP] max call duration ({MAX_CALL_SECONDS}s) reached, ending without another reply")
+                await hang_up("max_duration_reached")
+                return
+
+            print(f"[LLM] turn {turn_count}, generating reply...")
+            reply_text = await asyncio.to_thread(generate_llm_reply, conversation_history)
+            print(f"[LLM] reply: {reply_text!r}")
+            conversation_history.append({"role": "assistant", "content": reply_text})
+
+            should_end = "[END_CALL]" in reply_text
+            spoken_text = reply_text.replace("[END_CALL]", "").strip()
+            await send_tts_reply(spoken_text)
+
+            if should_end:
+                print("[LLM] signaled end of conversation")
+                await hang_up("llm_end_signal")
 
         async def twilio_to_deepgram():
             nonlocal frame_count, call_sid, stream_sid
@@ -270,6 +322,10 @@ async def media_stream(websocket: WebSocket):
                     elif event == "stop":
                         print(f"[stop] total frames forwarded to Deepgram: {frame_count}")
                         await dg_ws.send(json.dumps({"type": "CloseStream"}))
+                        # Covers the case where the far end hangs up first, before
+                        # our own turn-end/safety-cap logic ever triggers a hang_up —
+                        # without this, that call's transcript/recording never gets saved.
+                        await hang_up("remote_stop")
                         break
 
             except Exception as e:
@@ -282,7 +338,7 @@ async def media_stream(websocket: WebSocket):
                     msg_type = data.get("type")
 
                     if msg_type == "UtteranceEnd":
-                        await end_call("UtteranceEnd")
+                        await handle_turn_end("UtteranceEnd")
                         continue
 
                     alternatives = data.get("channel", {}).get("alternatives", [{}])
@@ -292,9 +348,10 @@ async def media_stream(websocket: WebSocket):
                         print(f"[{tag}] {transcript}")
                         if data.get("is_final"):
                             transcript_turns.append({"speaker": "agent", "text": transcript})
+                            agent_buffer.append(transcript)
 
                     if data.get("speech_final"):
-                        await end_call("speech_final")
+                        await handle_turn_end("speech_final")
 
             except Exception as e:
                 print(f"Deepgram side closed: {e}")
