@@ -1,4 +1,14 @@
 """
+Barge-in, piece 1 (this addition): prove overlapping audio actually works
+on a real Twilio call — a scripted interjection fires once, early in the
+call, based on an INTERIM transcript (i.e. while their agent is still
+mid-sentence), instead of waiting for speech_final/UtteranceEnd like every
+other turn. This is deliberately opt-in (INTERRUPT_MODE) and fires at most
+once per call — normal turn-taking for every other exchange is unaffected.
+Built to test bug category 5 (failure to handle interruption) from
+BUG_CATEGORIES.md, which the bot's normal architecture can't probe on its
+own since it always waits for a full turn-end.
+
 Step 2, piece 1 (done): real LLM reasoning replaces the scripted reply —
 proved the LLM call works inside this pipeline with a single exchange
 before piece 2 (below) builds the harder part.
@@ -84,6 +94,11 @@ OPENAI_MODEL = "gpt-4o-mini"  # switched from Anthropic mid-Step 2 — ran out o
 
 MAX_TURNS = 16  # 8 wasn't enough to reach a natural conclusion in the first real multi-turn test
 MAX_CALL_SECONDS = 180
+
+# Barge-in test (bug category 5). Opt-in per call, fires at most once.
+INTERRUPT_MODE = True
+INTERRUPT_TRIGGER_WORDS = 4  # only interrupt once they're clearly mid-sentence, not on their first word or two
+INTERRUPT_TEXT = "Sorry, can I ask something real quick?"
 
 PATIENT_SYSTEM_PROMPT = (
     "You are Maria Gonzalez, calling Pivot Point Orthopedics as a new patient. "
@@ -208,6 +223,7 @@ async def media_stream(websocket: WebSocket):
     conversation_history = []
     agent_buffer = []
     turn_count = 0
+    has_interrupted = False
 
     async with websockets.connect(
         DEEPGRAM_URL,
@@ -332,6 +348,7 @@ async def media_stream(websocket: WebSocket):
                 print(f"Twilio side closed: {e} (frames forwarded: {frame_count})")
 
         async def deepgram_to_transcript():
+            nonlocal has_interrupted
             try:
                 async for message in dg_ws:
                     data = json.loads(message)
@@ -349,6 +366,20 @@ async def media_stream(websocket: WebSocket):
                         if data.get("is_final"):
                             transcript_turns.append({"speaker": "agent", "text": transcript})
                             agent_buffer.append(transcript)
+                        elif (
+                            INTERRUPT_MODE
+                            and not has_interrupted
+                            and not call_over
+                            and len(transcript.split()) >= INTERRUPT_TRIGGER_WORDS
+                        ):
+                            has_interrupted = True
+                            elapsed = time.time() - call_start
+                            print(
+                                f"[INTERRUPT] barging in at {elapsed:.1f}s while agent mid-sentence: "
+                                f"{transcript!r}"
+                            )
+                            conversation_history.append({"role": "assistant", "content": INTERRUPT_TEXT})
+                            await send_tts_reply(INTERRUPT_TEXT)
 
                     if data.get("speech_final"):
                         await handle_turn_end("speech_final")

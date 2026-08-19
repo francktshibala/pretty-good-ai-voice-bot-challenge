@@ -222,3 +222,17 @@ Unlike Steps 1 and 2, this step didn't get broken into pieces verified by real t
 **Not yet done:** Step 4 (designing specific real calls mapped to scenarios and these categories, then making the 10+ real calls) hasn't started.
 
 ---
+
+## 2026-08-19 — Barge-in capability built and confirmed working (resolves Step 3's open decision)
+
+**Decision:** Chose to build real barge-in capability rather than skip category 5 or treat it as a manual test — implemented as deliberately opt-in (`INTERRUPT_MODE`) and firing at most once per call, so normal turn-taking on every other exchange is unaffected. Mechanism: instead of waiting for `speech_final`/`UtteranceEnd`, watch for an *interim* transcript that's already several words long (`INTERRUPT_TRIGGER_WORDS=4`, meaning the agent is clearly mid-sentence, not just starting), and fire a short scripted interjection through the same `send_tts_reply()` path used for normal turns. `twilio_to_deepgram` keeps forwarding their audio in the background throughout, so this is genuine overlapping audio on the live call, not a simulated effect.
+
+**Ran a real test call — confirmed working, with real findings:**
+- Barge-in fired correctly at 2.2s, while their agent was still mid-sentence.
+- **Real finding on their system's interruption handling:** their agent's opening disclosure line completed word-for-word, completely unaffected by being talked over — no pause, no acknowledgment, no reaction. Recorded as an observation, not asserted as a clear bug — a fixed compliance disclosure ignoring interruption could be intentional design, not a defect. The bug report should state what was observed and let severity be judged from there, not overclaim.
+- **First call to reach a genuine natural ending** — 12 turns, ended via a real `[END_CALL]` signal rather than a safety cap. Flowed through name/DOB confirmation and a phone-number lookup, then got transferred to what sounds like a generic fallback line (*"Hello? You've reached the pretty good Ai test line. Goodbye."*).
+- **Inconsistency worth noting:** this run never reached specific date/time negotiation the way the earlier 16-turn call did (Thursday, August 20th) — same persona, same scenario, different call, meaningfully different flow branch. Their system's behavior appears to vary call to call, not just in response content but in which path the conversation takes.
+
+**Step 3's open decision is now resolved** — barge-in is a real, working, tested capability. Ready to design Step 4's specific calls, including deciding which one(s) deliberately use `INTERRUPT_MODE`.
+
+---
