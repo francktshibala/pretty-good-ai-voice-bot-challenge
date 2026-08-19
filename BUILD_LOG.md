@@ -395,3 +395,15 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Not yet done:** 2 of 12 calls remain (11 and 12).
 
 ---
+
+## 2026-08-19 — Step 4, call 11 (naturalistic rambling): real flaw found in our own bot, dead-end transfer hits 5th time
+
+**Call 11 (Bill Harmon, deliberately roundabout persona) — 142.8s, 11 turns, ended via [END_CALL].**
+
+**Real bug in our own prompt design, worth documenting honestly:** turns 1 and 2 produced 24.4s and 21.4s of continuous TTS audio each — genuinely excessive, and turn 2 repeated a near-identical "beautiful weather" tangent already made in turn 1. The scenario prompt explicitly said "don't overdo it or ramble on every single turn, just make your opening a bit more natural," but the LLM didn't respect that constraint. Real callers don't monologue uninterrupted for 20+ seconds on the phone — this works directly against the eval's "realistic pacing" requirement. This is a limitation in our own persona design, not a finding about their system, and should be named as such rather than glossed over — evidence of iteration cuts both ways.
+
+**Their system:** no "Maria" bug this time (further supports it being tied to a specific flow branch, not universal) — name, DOB, and phone number all confirmed correctly. But the **dead-end transfer pattern recurred a 5th time**: straight from phone/DOB confirmation to "Transferring you now" and the same canned dead-end line, without ever reaching actual scheduling. Running tally: 5 dead-end calls (2, 3, 6, 9, 11) vs. 2 successful completed bookings (1, 8) — this ratio is now well past coincidence and should be the headline finding of the report.
+
+**Not yet done:** 1 of 12 calls remains (12, the mid-conversation barge-in follow-up).
+
+---
