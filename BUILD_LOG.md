@@ -367,3 +367,17 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Not yet done:** 4 of 12 calls remain (9 through 12).
 
 ---
+
+## 2026-08-19 — Step 4, call 9 (calling on behalf of someone else): identity handling passes, dead-end transfer hits a 4th time
+
+**Call 9 (Susan Meyer calling for her son Ethan) — 127.4s, 7 turns, ended via [END_CALL] but the underlying task was not actually completed (see below).**
+
+**No "Maria" bug this time** — worth noting as a data point: this call's persona proactively volunteered full identifying info in its very first turn, before being asked, which may have bypassed whichever flow branch normally triggers the caller-ID/"Maria" step. Supports the theory that it's tied to a specific lookup step rather than firing unconditionally.
+
+**Positive finding: caller-vs-patient identity handled correctly throughout.** The agent consistently tracked Ethan as the patient (asking for *his* last name, DOB, spelling) while separately confirming Susan's own phone number as the contact — no confusion between who's calling and who the appointment is for. This edge case passed cleanly, no bug found.
+
+**But the dead-end transfer pattern recurs, 4th occurrence:** immediately after phone/DOB confirmation, the agent said *"Transferring you now"* and landed on the same canned dead-end line as calls 2, 3, and 6 — **without ever discussing appointment availability or actually scheduling anything.** The task itself was never completed, despite otherwise-correct identity handling. Running tally: 4 calls now end in this dead-end (2, 3, 6, 9) vs. only 2 reaching an actual confirmed booking (1, 8) — a meaningful ratio worth stating plainly in the report rather than treating each occurrence as isolated.
+
+**Not yet done:** 3 of 12 calls remain (10 through 12).
+
+---
