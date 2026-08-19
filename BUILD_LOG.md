@@ -429,3 +429,15 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Not yet done:** Not yet committed to git (next step). Step 5 (iteration review) and Step 6 (deliverables) haven't started.
 
 ---
+
+## 2026-08-19 — Step 6 documents drafted: README, ARCHITECTURE.md, BUG_REPORT.md, start_server.sh
+
+**What happened:** Treated Step 5 (iterate) as already satisfied by this log's real-time record of decisions and fixes made across the build, rather than a separate pass — the plan's own criterion is "keep a rough sense of what changed after which round of calls," which this file already is. Moved straight into Step 6's documentation:
+
+- Rewrote `README.md` (previously just a title stub) with real setup steps, accounts needed, and how to run — including a new `start_server.sh` that launches the server + ngrok tunnel together in one command, getting closer to the plan's "ideally a single command" goal given the real setup needs two long-running processes plus a separate call-placing step (scenario choice is a per-call decision, so it can't be folded into one fixed command).
+- Wrote `ARCHITECTURE.md` — kept to the plan's specified 1-2 paragraph scope (came out as 3 tight paragraphs: what was built, why this stack and what else was considered, safety/cost bounds), pulling directly from `PLAN.md` Section 7's resolved decisions and this log's real bugs/fixes rather than restating the whole build history.
+- Wrote `BUG_REPORT.md` — 5 findings ordered by severity (patient data mixup ranked highest despite being observed once, over the more frequent but less severe dead-end-transfer pattern, per the reasoning already logged when call 12 was found), 4 positive findings, and one honest self-critique of our own bot's flaw from call 11 kept in rather than omitted. Every finding cites the specific `calls/` file(s) as evidence rather than asserting from memory.
+
+**Not yet done:** Loom videos, submission form, and receipts are all user actions that can't be done by an agent — flagged, not attempted. Not yet committed to git.
+
+---
