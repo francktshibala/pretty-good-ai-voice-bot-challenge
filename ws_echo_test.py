@@ -1,15 +1,18 @@
 """
-Step 1, piece 2 (streaming audio -> transcription) and piece 3
-(turn-detection), built as one evolving server.
+Step 1, pieces 2-4, built as one evolving server.
 
 Piece 2, sub-pieces 1-3 (done): tunnel reachable, Twilio frames logged,
 Deepgram live transcription confirmed on a real call.
 
-Piece 3 (this addition): Deepgram's endpointing/UtteranceEnd signals
-replace the fixed test-script timer as the real "their agent stopped
-talking" signal. On detection, the server itself hangs up the call via
-the Twilio REST API — closer to how the real bot will eventually behave
-(the pipeline reacts to a turn boundary, not an external script).
+Piece 3 (done): Deepgram's endpointing/UtteranceEnd signals replace the
+fixed test-script timer as the real "their agent stopped talking" signal.
+
+Piece 4 (this addition): on turn-end, synthesize a scripted line via
+ElevenLabs (not real LLM reasoning yet — proving the loop closes end to
+end is the point of this piece, per the plan's walking-skeleton step),
+stream it back to Twilio over the same bidirectional connection, then
+hang up. Closes the full loop: call -> transcribe -> detect turn ->
+speak back -> end.
 
 Run with: python3 -u ws_echo_test.py   (unbuffered — see piece 2 log
 entry for why this matters)
@@ -20,6 +23,7 @@ import asyncio
 import base64
 import json
 
+import requests
 import websockets
 from fastapi import FastAPI, WebSocket
 from twilio.rest import Client
@@ -49,6 +53,21 @@ DEEPGRAM_URL = (
 
 twilio_client = Client(ENV["TWILIO_ACCOUNT_SID"], ENV["TWILIO_AUTH_TOKEN"])
 
+ELEVENLABS_API_KEY = ENV.get("ELEVENLABS_API_KEY", "")
+ELEVENLABS_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"  # "Sarah" — confirmed present in this account's own voice list; placeholder for this checkpoint, a persona voice gets picked deliberately in Step 2
+SCRIPTED_REPLY_TEXT = "Hi, I'd like to schedule an appointment please."
+
+
+def synthesize_speech_ulaw(text):
+    """Returns raw 8kHz mulaw audio bytes — the exact format Twilio expects, no transcoding needed."""
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{ELEVENLABS_VOICE_ID}"
+    headers = {"xi-api-key": ELEVENLABS_API_KEY, "Content-Type": "application/json"}
+    params = {"output_format": "ulaw_8000"}
+    payload = {"text": text, "model_id": "eleven_turbo_v2_5"}
+    r = requests.post(url, headers=headers, params=params, json=payload, timeout=30)
+    r.raise_for_status()
+    return r.content
+
 
 @app.get("/")
 def health():
@@ -75,6 +94,7 @@ async def media_stream(websocket: WebSocket):
 
     frame_count = 0
     call_sid = None
+    stream_sid = None
     turn_ended = False
 
     async with websockets.connect(
@@ -83,19 +103,43 @@ async def media_stream(websocket: WebSocket):
     ) as dg_ws:
         print("Connected to Deepgram streaming API")
 
+        async def send_tts_reply(text):
+            if not stream_sid:
+                print("[TTS] no streamSid yet, skipping reply")
+                return
+            print(f"[TTS] synthesizing: {text!r}")
+            audio_bytes = synthesize_speech_ulaw(text)
+            print(f"[TTS] got {len(audio_bytes)} bytes of mulaw audio, sending to Twilio")
+
+            chunk_size = 160  # 20ms of 8kHz 8-bit mulaw, matches Twilio's own frame size
+            for i in range(0, len(audio_bytes), chunk_size):
+                chunk = audio_bytes[i : i + chunk_size]
+                media_msg = {
+                    "event": "media",
+                    "streamSid": stream_sid,
+                    "media": {"payload": base64.b64encode(chunk).decode("utf-8")},
+                }
+                await websocket.send_text(json.dumps(media_msg))
+
+            playback_seconds = len(audio_bytes) / 8000  # 8000 bytes/sec at 8kHz 8-bit mulaw
+            print(f"[TTS] all frames sent, waiting ~{playback_seconds:.1f}s for playback")
+            await asyncio.sleep(playback_seconds + 0.5)
+
         async def end_call(reason):
             nonlocal turn_ended
             if turn_ended or not call_sid:
                 return
             turn_ended = True
-            print(f"[TURN END DETECTED] reason={reason} -> hanging up call {call_sid}")
+            print(f"[TURN END DETECTED] reason={reason}")
+            await send_tts_reply(SCRIPTED_REPLY_TEXT)
+            print(f"-> hanging up call {call_sid}")
             try:
                 twilio_client.calls(call_sid).update(status="completed")
             except Exception as e:
                 print(f"Failed to hang up call (may have already ended): {e}")
 
         async def twilio_to_deepgram():
-            nonlocal frame_count, call_sid
+            nonlocal frame_count, call_sid, stream_sid
             try:
                 while True:
                     raw = await websocket.receive_text()
@@ -108,6 +152,7 @@ async def media_stream(websocket: WebSocket):
                     elif event == "start":
                         start = msg.get("start", {})
                         call_sid = start.get("callSid")
+                        stream_sid = start.get("streamSid")
                         print(
                             f"[start] callSid={call_sid} "
                             f"mediaFormat={start.get('mediaFormat')}"

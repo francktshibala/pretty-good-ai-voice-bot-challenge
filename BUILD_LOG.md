@@ -130,3 +130,15 @@ Ran a real test call: `speech_final` fired immediately after Deepgram's real fin
 **Not yet done:** No TTS reply yet (piece 4 — the call currently just hangs up silently once their agent stops talking, doesn't say anything back). No transcript saved to disk yet (piece 5).
 
 ---
+
+## 2026-08-19 — Step 1, piece 4: full loop closes (scripted ElevenLabs reply)
+
+**What happened:** On turn-end detection, the server now synthesizes a scripted line ("Hi, I'd like to schedule an appointment please." — not real LLM reasoning yet, per the plan's walking-skeleton scope) via ElevenLabs, requesting `output_format=ulaw_8000` directly so no transcoding step is needed, chunks the raw audio into 160-byte (20ms) frames matching Twilio's own frame size, and streams them back over the same bidirectional `<Connect><Stream>` connection before hanging up.
+
+**Bug hit and fixed, real debugging example:** First attempt failed with `402 Payment Required` on the ElevenLabs call. Initial hypothesis was that `ulaw_8000` (a raw/telephony output format) was gated behind a paid tier — checked the account's actual subscription via `/v1/user/subscription` and confirmed it's on the free tier, which seemed to support that theory. But testing the plain default `mp3_44100_128` format with the same voice ID *also* failed with 402, which ruled out output-format gating as the cause. Read the actual error body instead of continuing to guess: `"Free users cannot use library voices via the API"` — the voice ID used (a commonly-referenced default ID from older ElevenLabs docs/examples, "Rachel") isn't in this account's own voice list at all; it's an unrelated shared library voice. Queried `/v1/voices` to get the account's real 32 available premade voices, swapped in a valid one ("Sarah"), and confirmed both `mp3` and `ulaw_8000` then returned `200` — so `ulaw_8000` was never actually gated on this account; the real bug was an invalid/unowned voice ID, not a billing restriction. Good example of not stopping at the first plausible theory (payment tier) and instead reading the actual error text and account data.
+
+Reran the test call end-to-end: real transcript captured, `speech_final` fired, ElevenLabs synthesized 18,204 bytes of mulaw audio, sent back over the stream, played (~2.3s), call hung up cleanly at 12.9s total. **This is the full walking skeleton loop working for the first time**: call -> transcribe -> detect turn -> speak scripted reply -> hang up.
+
+**Not yet done:** No transcript/recording saved to disk yet as deliverable-format artifacts (piece 5, the last piece of Step 1) — this run proved the loop closes but didn't persist anything to disk yet.
+
+---
