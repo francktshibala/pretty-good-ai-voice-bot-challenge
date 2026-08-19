@@ -1,0 +1,103 @@
+{
+  "call_sid": "CA1f81840fd38e015b08c4142d56a903f2",
+  "scenario": "12_barge_in_mid_conversation",
+  "saved_at": "2026-08-19T21:51:36.089773+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Okay, that's fine. I\u2019d like to schedule an appointment for hip pain that started after a fall."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot."
+    },
+    {
+      "speaker": "agent",
+      "text": "Point Ortho, part of pretty good Ai. How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, I\u2019d like to schedule an appointment for some hip pain I\u2019ve been experiencing after a fall. I\u2019m available weekday afternoons."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sorry, can I ask something real quick?"
+    },
+    {
+      "speaker": "agent",
+      "text": "I see you're calling from the number we have on"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's correct. My phone number is 555-712-6634."
+    },
+    {
+      "speaker": "agent",
+      "text": "Can I have your date of birth, please?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure, it\u2019s February 27, 1988."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to confirm, you mentioned hit pain after a fall."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is this appointment for an urgent concern that needs prompt attention?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Or is it more of a routine office visit to check on your hit?"
+    },
+    {
+      "speaker": "bot",
+      "text": "It\u2019s more of an urgent concern since the pain started right after the fall. I'd like to get it checked out soon."
+    },
+    {
+      "speaker": "agent",
+      "text": "Do you have a preferred provider or are you open to"
+    },
+    {
+      "speaker": "agent",
+      "text": "seeing the first available."
+    },
+    {
+      "speaker": "bot",
+      "text": "I'm open to seeing the first available provider."
+    },
+    {
+      "speaker": "agent",
+      "text": "You already have an acute appointment booked"
+    },
+    {
+      "speaker": "agent",
+      "text": "for Thursday, August twentieth at one thirty Pm."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to keep this appointment, reschedule it or cancel it?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I\u2019d like to keep the appointment for Thursday, August twentieth at one thirty PM. Thank you!"
+    },
+    {
+      "speaker": "agent",
+      "text": "Your appointment for Thursday, August twentieth at one thirty Pm is confirmed."
+    },
+    {
+      "speaker": "agent",
+      "text": "If you need to make any changes or have more questions, just let me know."
+    },
+    {
+      "speaker": "bot",
+      "text": "Great! Thank you for your help. Have a good day!"
+    }
+  ]
+}

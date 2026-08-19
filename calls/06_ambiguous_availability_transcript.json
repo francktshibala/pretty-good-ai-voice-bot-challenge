@@ -1,0 +1,131 @@
+{
+  "call_sid": "CA7c007271af1cd4798094e4f9c91af87a",
+  "scenario": "06_ambiguous_availability",
+  "saved_at": "2026-08-19T21:23:56.491275+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Alright, that\u2019s fine. I'm looking to schedule an appointment for some shoulder pain."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot point Orthopedic, part of pretty good ai"
+    },
+    {
+      "speaker": "agent",
+      "text": "How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, I\u2019d like to make an appointment for some shoulder pain I\u2019ve been having."
+    },
+    {
+      "speaker": "agent",
+      "text": "I see you're calling from the number we have on file."
+    },
+    {
+      "speaker": "agent",
+      "text": "Am I speaking with Maria?"
+    },
+    {
+      "speaker": "bot",
+      "text": "No, this is Tom Whitfield."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please provide your full date of birth."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure, it\u2019s April 3, 1995."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to"
+    },
+    {
+      "speaker": "agent",
+      "text": "can you please spell your first and last name for me?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Of course. It's T-O-M W-H-I-T-F-I-E-L-D."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to use your phone number"
+    },
+    {
+      "speaker": "agent",
+      "text": "to look up your record. If so, please provide the number you have on file with us,"
+    },
+    {
+      "speaker": "agent",
+      "text": "If you're not sure, I can confirm your name and date of birth again."
+    },
+    {
+      "speaker": "agent",
+      "text": "Which would you prefer?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I can provide my phone number. It's the one I'm calling from."
+    },
+    {
+      "speaker": "agent",
+      "text": "Great."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please say the phone number you have on file with us just to confirm,"
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure, it\u2019s 555-123-4567."
+    },
+    {
+      "speaker": "agent",
+      "text": "I have your phone number as"
+    },
+    {
+      "speaker": "agent",
+      "text": "five five one two three four five six seven."
+    },
+    {
+      "speaker": "agent",
+      "text": "And your date of birth as"
+    },
+    {
+      "speaker": "bot",
+      "text": "That\u2019s correct, and my date of birth is April 3, 1995."
+    },
+    {
+      "speaker": "agent",
+      "text": "April third nineteen ninety five."
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's right. Thank you for confirming. Now, about that appointment for my shoulder pain\u2014I'm thinking maybe Tuesday or Wednesday, whichever works best. I'm pretty flexible."
+    },
+    {
+      "speaker": "agent",
+      "text": "Transferring ringing you now. Thank you."
+    },
+    {
+      "speaker": "bot",
+      "text": "Okay, thanks!"
+    },
+    {
+      "speaker": "agent",
+      "text": "Hello. You've reached the pretty good Ai test line. Goodbye."
+    },
+    {
+      "speaker": "bot",
+      "text": "Uh, I'm still here to schedule an appointment. Can I get transferred back?"
+    }
+  ]
+}

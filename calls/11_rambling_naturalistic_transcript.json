@@ -1,0 +1,107 @@
+{
+  "call_sid": "CAc8b8544d04e849cddd0c52c3775867f2",
+  "scenario": "11_rambling_naturalistic",
+  "saved_at": "2026-08-19T21:43:25.737132+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Oh, I totally understand! That\u2019s just the world we live in these days, isn\u2019t it? Anyway, thanks for letting me know. My name is Bill Harmon, and I was actually just out walking my dog around the neighborhood -- you know, enjoying the nice weather we\u2019ve been having lately. But I digress! The real reason I'm calling is that I've been having some knee pain that's been bothering me quite a bit. I was hoping to schedule an appointment to get it checked out."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot point ortho"
+    },
+    {
+      "speaker": "agent",
+      "text": "Pe, part of pretty good Ai. May I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi there! Yes, I appreciate you taking my call. I was just mentioning to someone earlier how beautiful it is outside right now. It always lifts my spirits! But back to why I'm calling. I\u2019ve been experiencing some discomfort in my knee, and it\u2019s been nagging at me for a little while now. I\u2019d really like to schedule an appointment to have it looked at. Can you help me with that?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Please provide your full date of first."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure thing! My date of birth is May 19, 1968."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to confirm, I have your name as Bill Harmon."
+    },
+    {
+      "speaker": "bot",
+      "text": "That\u2019s correct! Bill Harmon. Thanks for confirming that."
+    },
+    {
+      "speaker": "agent",
+      "text": "And your date of birth as May nineteenth"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that\u2019s right! May 19th, 1968. I appreciate you checking!"
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to use your phone number to look up your record?"
+    },
+    {
+      "speaker": "agent",
+      "text": "If so, please provide the number you have on file with us."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure! My phone number is 555-123-4567. That should help you pull up my record. Thank you!"
+    },
+    {
+      "speaker": "agent",
+      "text": "If you're not sure, just let me know."
+    },
+    {
+      "speaker": "bot",
+      "text": "I\u2019m fairly certain that\u2019s the number on file, but if it doesn't work, I can always provide other information to help verify my record. Just let me know!"
+    },
+    {
+      "speaker": "agent",
+      "text": "I'd have your phone number. As five five five"
+    },
+    {
+      "speaker": "agent",
+      "text": "one two three"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that sounds right! So, five five five, one two three, four five six seven. Thank you for confirming that!"
+    },
+    {
+      "speaker": "agent",
+      "text": "four five six seven"
+    },
+    {
+      "speaker": "bot",
+      "text": "That\u2019s correct! Four five six seven. Thanks for your patience with that!"
+    },
+    {
+      "speaker": "agent",
+      "text": "And your date of birth,"
+    },
+    {
+      "speaker": "bot",
+      "text": "My date of birth is May 19, 1968."
+    },
+    {
+      "speaker": "agent",
+      "text": "Transferring you now. Thank you."
+    },
+    {
+      "speaker": "bot",
+      "text": "Thank you for your help! I appreciate it."
+    }
+  ]
+}

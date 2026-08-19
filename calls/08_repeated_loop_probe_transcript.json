@@ -1,0 +1,143 @@
+{
+  "call_sid": "CA3480f166627085166f4e6dfbd88d0bfc",
+  "scenario": "08_repeated_loop_probe",
+  "saved_at": "2026-08-19T21:31:53.316467+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Okay, that\u2019s fine. I'm calling to schedule an appointment for some elbow pain I\u2019ve been having."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot point Orthopedic. Part a pretty good Ai."
+    },
+    {
+      "speaker": "agent",
+      "text": "How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Uh, sorry, what was that? Can you say that again? I need to schedule an appointment for elbow pain."
+    },
+    {
+      "speaker": "agent",
+      "text": "I see you're calling from the number we have on file."
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's correct. Can we go ahead and schedule an appointment?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Speaking with Maria."
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, Maria! When's the earliest I can come in for this elbow pain?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Please provide your"
+    },
+    {
+      "speaker": "bot",
+      "text": "Uh, sorry, what was that? Can you say that again? I didn't catch it."
+    },
+    {
+      "speaker": "agent",
+      "text": "I'm need"
+    },
+    {
+      "speaker": "bot",
+      "text": "Oh, I see. I need to provide my date of birth. It's November 30, 2000."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please tell me..."
+    },
+    {
+      "speaker": "bot",
+      "text": "Uh, sorry, what was that? Can you say that again?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Please confirm your date of birth is in November t two thousand"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's correct. My date of birth is November 30, 2000."
+    },
+    {
+      "speaker": "agent",
+      "text": "You mentioned elbow pain."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is this visit for an urgent concern that needs prompt attention?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Or is it more of a routine issue?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Uh, sorry, what was that? Can you say that again? I think it's more of a routine issue, but the pain has been bothering me for a while."
+    },
+    {
+      "speaker": "agent",
+      "text": "We have openings as soon as tomorrow"
+    },
+    {
+      "speaker": "agent",
+      "text": "with your primary providers. Do you have a preference between doctors as a big new"
+    },
+    {
+      "speaker": "agent",
+      "text": "Lu or Doctor Kelly Noble, or would you like the first available?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I don't have a strong preference, so the first available doctor works for me."
+    },
+    {
+      "speaker": "agent",
+      "text": "The earliest slot is tomorrow Thursday, August twentieth."
+    },
+    {
+      "speaker": "agent",
+      "text": "At ten Am with doctors of being you Le."
+    },
+    {
+      "speaker": "bot",
+      "text": "Uh, sorry, what was that? Can you say that again?"
+    },
+    {
+      "speaker": "agent",
+      "text": "You like to book that appointment? Would"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, I would like to book that appointment for tomorrow at 10 AM with Dr. Lu."
+    },
+    {
+      "speaker": "agent",
+      "text": "As soon appointment is tomorrow at ten Am with doctors Zen new la"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that sounds good! I'll see you tomorrow at 10 AM with Dr. Lu. Thank you!"
+    },
+    {
+      "speaker": "agent",
+      "text": "Your appointment is set for tomorrow."
+    },
+    {
+      "speaker": "bot",
+      "text": "Great! Thank you for your help. Goodbye!"
+    }
+  ]
+}

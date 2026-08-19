@@ -1,0 +1,175 @@
+{
+  "call_sid": "CA4091e3df97e288ba640c311438a32149",
+  "scenario": "default_maria",
+  "saved_at": "2026-08-19T20:57:20.754663+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, I'm Maria Gonzalez, and I\u2019d like to schedule an appointment. I've had knee pain for about two weeks after a hiking trip."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot point Orthopedic, Part of pretty good Ai"
+    },
+    {
+      "speaker": "agent",
+      "text": "How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I\u2019d like to make an appointment to get my knee pain checked out. I'm available on weekday afternoons."
+    },
+    {
+      "speaker": "agent",
+      "text": "See you're calling from the number we have on file."
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's correct. My phone number is 555-201-4477."
+    },
+    {
+      "speaker": "agent",
+      "text": "Am I speaking with Maria?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, this is Maria Gonzalez."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please provide your date of birth."
+    },
+    {
+      "speaker": "bot",
+      "text": "My date of birth is March 14, 1990."
+    },
+    {
+      "speaker": "agent",
+      "text": "You mentioned Knee."
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, I've been experiencing knee pain for about two weeks after a hiking trip."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is this a new issue or a follow from"
+    },
+    {
+      "speaker": "bot",
+      "text": "It's a new issue. I haven\u2019t had any knee problems like this before."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for sharing that. Do you have a preferred provider or are you"
+    },
+    {
+      "speaker": "agent",
+      "text": "seeing anyone available."
+    },
+    {
+      "speaker": "bot",
+      "text": "I'm open to seeing anyone available."
+    },
+    {
+      "speaker": "agent",
+      "text": "We have weekday afternoon openings this week."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you prefer an early or late afternoon slot?"
+    },
+    {
+      "speaker": "agent",
+      "text": "For example, we have times at one Pm, one fifteen Pm and one thirty"
+    },
+    {
+      "speaker": "agent",
+      "text": "Pm on Thursday with"
+    },
+    {
+      "speaker": "bot",
+      "text": "I can do any of those times on Thursday. One thirty PM works best for me."
+    },
+    {
+      "speaker": "agent",
+      "text": "doctor Z big New, Le."
+    },
+    {
+      "speaker": "bot",
+      "text": "Great, so I\u2019ll be seeing Dr. Z. Can you confirm the appointment for Thursday at one thirty PM?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Your appointment is confirmed for Thursday, August twentieth at"
+    },
+    {
+      "speaker": "agent",
+      "text": "thirty Pm with doctor Zig new, Lac at Pivot point Orthopedic."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please bring your photo Id, insurance card."
+    },
+    {
+      "speaker": "agent",
+      "text": "A list of current medications, and any imaging desks if you have them."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like a text message with your appointment details?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, please! A text message with the appointment details would be helpful. Thank you!"
+    },
+    {
+      "speaker": "agent",
+      "text": "I have your number as five five five"
+    },
+    {
+      "speaker": "agent",
+      "text": "two zero one four four seven seven."
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's correct. Thank you for confirming."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is that correct?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that\u2019s correct."
+    },
+    {
+      "speaker": "agent",
+      "text": "It looks like the system is having trouble sending a text to that number."
+    },
+    {
+      "speaker": "agent",
+      "text": "I'll make sure our clinic support team follows up with your appointment details."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is there anything else I can help you with today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "No, that's all for now. Thank you for your help!"
+    },
+    {
+      "speaker": "agent",
+      "text": "You're all set for your appointment."
+    },
+    {
+      "speaker": "agent",
+      "text": "If you need anything else, just give us a call. Have a great day."
+    }
+  ]
+}

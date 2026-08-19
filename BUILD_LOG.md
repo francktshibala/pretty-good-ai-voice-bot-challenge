@@ -421,3 +421,11 @@ Both questions got direct, correct-sounding answers: "open Monday through Friday
 **Step 4's 12 real calls are complete.** Next: Step 5 (iterate — review what changed across rounds, already substantially documented in this log) and Step 6 (deliverables: architecture doc, bug report, Loom videos, submission).
 
 ---
+
+## 2026-08-19 — Real deliverable gap caught: call recordings/transcripts weren't actually in the repo
+
+**What happened:** Checking `call_logs/` before moving to Step 6 surfaced a real gap — that directory was gitignored back in Step 1 (correctly, at the time, since it only held infra-proving test calls), but the 12 real Step 4 calls had been landing there too, meaning none of them were actually committed anywhere despite the deliverable explicitly requiring 10+ real call recordings + matching transcripts in the public repo. Identified the 12 real calls precisely by their `scenario` field in each transcript JSON (11 named scenarios plus `default_maria`, confirmed earlier as textually identical to `01_baseline`), copied and renamed them by scenario name instead of raw call SID into a new committed `calls/` directory (6.2MB total, no LFS needed), leaving the earlier infra-test calls behind in the still-gitignored `call_logs/`.
+
+**Not yet done:** Not yet committed to git (next step). Step 5 (iteration review) and Step 6 (deliverables) haven't started.
+
+---

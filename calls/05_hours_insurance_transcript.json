@@ -1,0 +1,59 @@
+{
+  "call_sid": "CAa1c3ebdfeb381775a83606b4b7baba67",
+  "scenario": "05_hours_insurance_question",
+  "saved_at": "2026-08-19T21:19:48.561984+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, is this Pivot Point Orthopedics? I just have a quick question: are you open on Saturdays?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot point Ortho orthopedic. Part of pretty good A"
+    },
+    {
+      "speaker": "agent",
+      "text": "may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi there! I\u2019m just wondering if you\u2019re open on Saturdays."
+    },
+    {
+      "speaker": "agent",
+      "text": "We're open Monday through Friday, but not on Saturdays."
+    },
+    {
+      "speaker": "agent",
+      "text": "If you need to schedule an appointment,"
+    },
+    {
+      "speaker": "bot",
+      "text": "Got it, thanks! One more question\u2014do you accept Blue Cross Blue Shield insurance?"
+    },
+    {
+      "speaker": "agent",
+      "text": "or have any questions, I can help with that."
+    },
+    {
+      "speaker": "bot",
+      "text": "Okay, I appreciate that! Do you accept Blue Cross Blue Shield insurance?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Yes. We accept most insurance plans, including Blue Cross"
+    },
+    {
+      "speaker": "agent",
+      "text": "Blue Shield,"
+    },
+    {
+      "speaker": "bot",
+      "text": "That's great to hear, thank you! I appreciate your help today. Goodbye!"
+    }
+  ]
+}

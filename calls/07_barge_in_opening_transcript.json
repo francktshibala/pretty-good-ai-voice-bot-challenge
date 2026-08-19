@@ -1,0 +1,179 @@
+{
+  "call_sid": "CA97dea6d973914f72269eab1d5d61313e",
+  "scenario": "07_barge_in_opening",
+  "saved_at": "2026-08-19T21:28:09.077591+00:00",
+  "turns": [
+    {
+      "speaker": "bot",
+      "text": "Sorry, can I ask something real quick?"
+    },
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "That\u2019s fine, I understand. I'm calling to schedule an appointment for wrist pain I've been having from typing too much at work."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Point Orthopedic."
+    },
+    {
+      "speaker": "agent",
+      "text": "Part of pretty good day high. How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi! I\u2019d like to schedule an appointment for some wrist pain I\u2019ve been experiencing. I'm available on weekday evenings."
+    },
+    {
+      "speaker": "agent",
+      "text": "I see you're calling from the number we have on file."
+    },
+    {
+      "speaker": "agent",
+      "text": "I speaking with Maria."
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi Maria, yes, that\u2019s me. I\u2019d really appreciate your help with setting up an appointment for my wrist pain."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please provide your date of birth."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure! My date of birth is October 11, 1992."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to confirm, you'd like to schedule an appointment for wrist pain."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is this a new issue that needs urgent attention or is it more of a routine concern?"
+    },
+    {
+      "speaker": "bot",
+      "text": "It's more of a routine concern, but it has been pretty uncomfortable lately. I\u2019d like to get it checked out."
+    },
+    {
+      "speaker": "agent",
+      "text": "This will help me book the rate taco visit for you."
+    },
+    {
+      "speaker": "bot",
+      "text": "Thanks! I'm looking to come in on a weekday evening. What do you have available?"
+    },
+    {
+      "speaker": "agent",
+      "text": "We have open"
+    },
+    {
+      "speaker": "agent",
+      "text": "this week and early next week. Do you have a preference"
+    },
+    {
+      "speaker": "agent",
+      "text": "between doctor Lu or doctor Kelly Noble?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I don't have a preference, so whichever one is available works for me."
+    },
+    {
+      "speaker": "agent",
+      "text": "Or would you like the first available?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, the first available appointment would be great."
+    },
+    {
+      "speaker": "agent",
+      "text": "Four"
+    },
+    {
+      "speaker": "bot",
+      "text": "Could you please let me know the date and time for that first available appointment?"
+    },
+    {
+      "speaker": "agent",
+      "text": "The first available appointment is Thursday, August twentieth at"
+    },
+    {
+      "speaker": "agent",
+      "text": "ten Am with doctor Z being Le."
+    },
+    {
+      "speaker": "bot",
+      "text": "That sounds good, but I meant to say I need a weekday evening. Do you have any evening slots available?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to book this slot?"
+    },
+    {
+      "speaker": "bot",
+      "text": "No, I need an evening slot. Do you have any options for that?"
+    },
+    {
+      "speaker": "agent",
+      "text": "It looks like the latest available slot is that"
+    },
+    {
+      "speaker": "agent",
+      "text": "three thirty Pm on Thursday, August twentieth."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to book that or should I check for later times on other days?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I\u2019d prefer to check for later times on other days if possible. Thank you!"
+    },
+    {
+      "speaker": "agent",
+      "text": "The latest slot on Friday on is twenty first is at three Pm?"
+    },
+    {
+      "speaker": "bot",
+      "text": "That's still during the day. What about next week? Do you have any evenings available then?"
+    },
+    {
+      "speaker": "agent",
+      "text": "You like to book that or should I check to follow it?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I\u2019d like to check for evening slots for next week, please."
+    },
+    {
+      "speaker": "agent",
+      "text": "The latest available slot next week is at three thirty Pm each weekday."
+    },
+    {
+      "speaker": "agent",
+      "text": "There are no evening appointments listed."
+    },
+    {
+      "speaker": "bot",
+      "text": "I understand. In that case, I\u2019ll go ahead and book the three thirty PM slot for next Thursday, August 21st."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to book a three thirty Pm?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, please book me for three thirty PM on Thursday, August 21st."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to confirm,"
+    }
+  ]
+}

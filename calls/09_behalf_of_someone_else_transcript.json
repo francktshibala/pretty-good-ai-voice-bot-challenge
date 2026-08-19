@@ -1,0 +1,95 @@
+{
+  "call_sid": "CAc9daaf55af2b6fe4abfc675fbe3e17cc",
+  "scenario": "09_behalf_of_someone_else",
+  "saved_at": "2026-08-19T21:35:26.643061+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, this is Susan Meyer. I\u2019m calling to schedule an appointment for my son, Ethan Meyer. He\u2019s been experiencing ankle pain from a sports injury. His date of birth is August 8, 2010."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling to the point Ortho orthopedic. Part of pretty good Ai."
+    },
+    {
+      "speaker": "agent",
+      "text": "How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, I\u2019m looking to schedule an appointment for my son, Ethan, regarding his ankle pain. I'm calling on his behalf."
+    },
+    {
+      "speaker": "agent",
+      "text": "Can you please provide Ethan agent's last name as well?"
+    },
+    {
+      "speaker": "agent",
+      "text": "I have this date of birth as August eighth twenty ten."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure, his last name is Meyer. So it's Ethan Meyer, born August 8, 2010."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to confirm, I have Ethan Meyer with the date of birth of August eight"
+    },
+    {
+      "speaker": "agent",
+      "text": "twenty ten. Is that correct? If so, could you please spell out his first and"
+    },
+    {
+      "speaker": "agent",
+      "text": "name for me?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's correct. His first name is spelled E-T-H-A-N, and his last name is M-E-Y-E-R."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to use the phone number to help look up"
+    },
+    {
+      "speaker": "agent",
+      "text": "Ethan record. If so, please provide the number you have on file with us."
+    },
+    {
+      "speaker": "agent",
+      "text": "If you're not sure, just confirm Ethan full name and date of birth for me one more time."
+    },
+    {
+      "speaker": "bot",
+      "text": "I can provide my own phone number for you to reach me. It's 555-604-2210. Ethan's full name is Ethan Meyer, and his date of birth is August 8, 2010."
+    },
+    {
+      "speaker": "agent",
+      "text": "I have your phone number as five five five six zero four two two one zero"
+    },
+    {
+      "speaker": "agent",
+      "text": "and Ethan date of birth as August eighth"
+    },
+    {
+      "speaker": "agent",
+      "text": "twenty ten. Le?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that\u2019s right. Thank you for confirming."
+    },
+    {
+      "speaker": "agent",
+      "text": "Transferring you now. Thank you."
+    },
+    {
+      "speaker": "bot",
+      "text": "Thank you! I appreciate your help. Goodbye!"
+    }
+  ]
+}

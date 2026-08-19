@@ -1,0 +1,167 @@
+{
+  "call_sid": "CAedec03c59801004d645dddc579931438",
+  "scenario": "03_reschedule_vague",
+  "saved_at": "2026-08-19T21:12:53.223262+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "Okay, that's fine. I'm just calling to reschedule my upcoming appointment."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot point Ortho orthopedic, part of pretty good Ai."
+    },
+    {
+      "speaker": "agent",
+      "text": "How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Hi, I'd like to reschedule my upcoming appointment. I think it was sometime last week, maybe Tuesday? I'm not totally sure, sorry."
+    },
+    {
+      "speaker": "agent",
+      "text": "I see you're calling from the number we have on file."
+    },
+    {
+      "speaker": "agent",
+      "text": "Am I speaking with Maria?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Actually, this is Janet Kowalski."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please provide your full date of birth."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure, it's September 22, 1978."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to confirm, I have your name as Janet Paw,"
+    },
+    {
+      "speaker": "agent",
+      "text": "and your date of birth of September twenty second nineteen seventy eight."
+    },
+    {
+      "speaker": "bot",
+      "text": "Actually, my last name is Kowalski, not Paw. So it's Janet Kowalski, September 22, 1978."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is that correct?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that's correct. Thank you!"
+    },
+    {
+      "speaker": "agent",
+      "text": "If so. Could you please... If"
+    },
+    {
+      "speaker": "bot",
+      "text": "It seems like you got cut off there. What would you like me to do?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like to use your phone number to look"
+    },
+    {
+      "speaker": "agent",
+      "text": "your record. If so, please tell me the number you have on file with us."
+    },
+    {
+      "speaker": "agent",
+      "text": "If you're not sure, I can confirm your name and date of birth."
+    },
+    {
+      "speaker": "bot",
+      "text": "I\u2019m not sure about the number you have on file, but my name is Janet Kowalski, and my date of birth is September 22, 1978."
+    },
+    {
+      "speaker": "agent",
+      "text": "Again."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure! My name is Janet Kowalski, and my date of birth is September 22, 1978."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you prefer?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I'm sorry, could you repeat that? I'm not sure what you're asking."
+    },
+    {
+      "speaker": "agent",
+      "text": "No problem."
+    },
+    {
+      "speaker": "agent",
+      "text": "Could you please spell your first and last name for me? This will help me find your record?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Of course! My first name is spelled J-A-N-E-T, and my last name is K-O-W-A-L-S-K-I."
+    },
+    {
+      "speaker": "agent",
+      "text": "I have your name as Janet Ko."
+    },
+    {
+      "speaker": "agent",
+      "text": "Your date of birth is September twenty second nineteen seventy eight."
+    },
+    {
+      "speaker": "bot",
+      "text": "That\u2019s almost right, but my last name is Kowalski, not Ko. So it\u2019s Janet Kowalski, September 22, 1978."
+    },
+    {
+      "speaker": "agent",
+      "text": "And your phone number as two six zero."
+    },
+    {
+      "speaker": "bot",
+      "text": "I'm not sure about the exact number, but I think that's correct so far. Is there something I need to confirm?"
+    },
+    {
+      "speaker": "agent",
+      "text": "I'm having trouble finding your record in our system."
+    },
+    {
+      "speaker": "bot",
+      "text": "Oh, I'm sorry to hear that. Is there another way you could look it up?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Can connect you to our patient support team."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure, that sounds good. Thank you!"
+    },
+    {
+      "speaker": "agent",
+      "text": "I've tried all the"
+    },
+    {
+      "speaker": "bot",
+      "text": "Okay, I understand. What should we do next?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Transferring you now. Thank you."
+    }
+  ]
+}

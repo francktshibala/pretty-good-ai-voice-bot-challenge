@@ -1,0 +1,159 @@
+{
+  "call_sid": "CAfcb299d70df5fac201c9a84e5bd30506",
+  "scenario": "02_spelled_dictated_info",
+  "saved_at": "2026-08-19T21:02:26.955327+00:00",
+  "turns": [
+    {
+      "speaker": "agent",
+      "text": "This call may be recorded for quality and training purposes."
+    },
+    {
+      "speaker": "bot",
+      "text": "That's fine. I'm calling to schedule an appointment for lower back pain that started about a week ago."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks for calling Pivot point Orthopedic, Part of pretty good."
+    },
+    {
+      "speaker": "agent",
+      "text": "How may I help you today?"
+    },
+    {
+      "speaker": "bot",
+      "text": "I\u2019d like to schedule an appointment for lower back pain, please."
+    },
+    {
+      "speaker": "agent",
+      "text": "Hi."
+    },
+    {
+      "speaker": "bot",
+      "text": "Hello! I\u2019m looking to set up an appointment for my lower back pain."
+    },
+    {
+      "speaker": "agent",
+      "text": "I can help with that."
+    },
+    {
+      "speaker": "bot",
+      "text": "Great! I'm available weekday mornings. What do you have open?"
+    },
+    {
+      "speaker": "agent",
+      "text": "May I have your full name and date of birth?"
+    },
+    {
+      "speaker": "bot",
+      "text": "My name is David Nkemelu, and my date of birth is June 2, 1985."
+    },
+    {
+      "speaker": "agent",
+      "text": "Just to confirm, I have your name as David Cam."
+    },
+    {
+      "speaker": "agent",
+      "text": "And your date of birth as June second, nineteen eighty five."
+    },
+    {
+      "speaker": "bot",
+      "text": "It's actually David Nkemelu. That's N as in November, K as in kilo, E, M, E, L, U. And my date of birth is correct."
+    },
+    {
+      "speaker": "agent",
+      "text": "Is that correct?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, that\u2019s correct. I'm ready to proceed with scheduling the appointment."
+    },
+    {
+      "speaker": "agent",
+      "text": "If not, could you please spell"
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure! It's N as in November, K as in kilo, E, M, E, L, U."
+    },
+    {
+      "speaker": "agent",
+      "text": "Would you like me to look up?"
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, please. Thanks for your help!"
+    },
+    {
+      "speaker": "agent",
+      "text": "Thanks"
+    },
+    {
+      "speaker": "bot",
+      "text": "You're welcome! Have you found any available times for me?"
+    },
+    {
+      "speaker": "agent",
+      "text": "Before I can check appointment times,"
+    },
+    {
+      "speaker": "agent",
+      "text": "I need to confirm your last name spelling."
+    },
+    {
+      "speaker": "bot",
+      "text": "Of course! It's N as in November, K as in kilo, E, M, E, L, U."
+    },
+    {
+      "speaker": "agent",
+      "text": "Could you please spell your full last name for me one..."
+    },
+    {
+      "speaker": "bot",
+      "text": "Sure! It's N as in November, K as in kilo, E, M, E, L, U."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you. I see you're calling from the number we have on file."
+    },
+    {
+      "speaker": "agent",
+      "text": "I speaking with Maria?"
+    },
+    {
+      "speaker": "bot",
+      "text": "No, this is David Nkemelu. I'm just calling to schedule an appointment."
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you for clarifying."
+    },
+    {
+      "speaker": "bot",
+      "text": "You're welcome! Can I provide any other information while you check for appointment times?"
+    },
+    {
+      "speaker": "agent",
+      "text": "To confirm is your full last name spelled..."
+    },
+    {
+      "speaker": "bot",
+      "text": "Yes, it's spelled N as in November, K as in kilo, E, M, E, L, U."
+    },
+    {
+      "speaker": "agent",
+      "text": "I'm having trouble finding your record in our system so I can't schedule the appointment right now."
+    },
+    {
+      "speaker": "agent",
+      "text": "I'll connect you to our patient support team for help."
+    },
+    {
+      "speaker": "bot",
+      "text": "All right, thank you for your assistance. I appreciate it."
+    },
+    {
+      "speaker": "agent",
+      "text": "Please stay on the line."
+    }
+  ]
+}
