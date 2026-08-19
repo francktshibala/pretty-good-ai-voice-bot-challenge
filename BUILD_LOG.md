@@ -282,3 +282,18 @@ This is a stronger, more clear-cut finding than anything found so far — repeat
 **Decision:** Confirmed the tunnel and server are healthy again (direct health check + ngrok API check both passed) and retried call 3 rather than switching infrastructure mid-Step-4. If this recurs, worth reconsidering a more stable tunnel (paid ngrok, or deploying the server somewhere persistent) rather than continuing to retry through it.
 
 ---
+
+## 2026-08-19 — Step 4, call 3 (retry): confirms call 2's failure pattern is reproducible, not one-off
+
+**Call 3 (reschedule, vague date) — 176.3s, 16 turns, hit the same failure pattern as call 2:**
+- Name repeatedly misheard, differently each time: "Janet Kowalski" transcribed as "Janet Paw," then later "Janet Ko" — two different wrong hearings of the same surname within one call.
+- **Same "can't find record" failure as call 2**: *"I'm having trouble finding your record in our system"* — despite the persona correctly providing name, DOB, and spelling on request. Ended in a transfer to "patient support."
+- Same dropped/truncated audio pattern seen before: *"If so. Could you please... If"* cut off mid-sentence.
+- **New finding, extends call 2's transfer observation**: after "Transferring you now," the call actually lands on a generic canned line — *"Hello. You've reached the pretty good Ai test line. Goodbye."* — not a real live transfer, a dead end. Same landing point as an earlier call's transfer. Suggests "transfer to patient support" is a stub/fake escalation path in this environment, not an actual handoff.
+- Minor, handled gracefully: hanging up via the Twilio API hit a `ConnectionResetError` right as their system was independently mid-transfer — already caught by existing error handling, no crash, just noted.
+
+**This is now two calls in a row failing the identical way** (repeated correct identity info → mishearing → "can't find record" → fake transfer → dead-end canned goodbye). Two independent occurrences is a real, reproducible pattern, not a one-off — almost certainly the strongest, highest-priority finding for the bug report so far: the system cannot reliably match/create patient records from verbally-provided (including explicitly spelled-out) information, and its own fallback path doesn't actually escalate anywhere.
+
+**Not yet done:** 9 of 12 calls remain (4 through 12).
+
+---
