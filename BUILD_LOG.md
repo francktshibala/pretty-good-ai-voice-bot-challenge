@@ -256,3 +256,21 @@ Unlike Steps 1 and 2, this step didn't get broken into pieces verified by real t
 **Not yet done:** Fix not yet reverified with an actual distinct scenario (next: rerun with a clearly different persona, e.g. `02_spelled_info`, so success/failure is unambiguous at a glance). None of the 12 real deliverable calls are finalized yet — this run's content was good but happened on the wrong/default persona, so it may or may not count as call 1 depending on how the reverification goes.
 
 ---
+
+## 2026-08-19 — Step 4, calls 1 & 2: fix confirmed, strong bug find on call 2
+
+**Fix confirmed:** ran call 2 (`02_spelled_info`, David Nkemelu persona) and the log shows `[SCENARIO] loaded '02_spelled_dictated_info'` — the `<Parameter>`/`customParameters` fix works. Separately confirmed call 1's content is still valid despite running on `DEFAULT_SCENARIO` rather than the `01_baseline.json` file directly: the two persona prompts are byte-identical text (copied from the same source when both were written), so the conversation itself is a legitimate `01_baseline` take even though the file-loading path wasn't exercised.
+
+**Call 1 (baseline scheduling) — strong result:** 14 turns, safety-cap-ended at 180s but only after reaching full natural completion. A real appointment was booked (Thursday, August 20th, 1:30 PM), name/DOB/phone confirmed correctly. **Real bug:** *"It looks like the system is having trouble sending a text to that number"* — their own SMS confirmation feature failed on a live attempt. Doctor's name came through garbled across transcription attempts ("doctor Zig new, Lac") — flagged for audio-vs-transcript verification before the report, not yet attributed.
+
+**Call 2 (spelled/dictated info) — strong bug chain, likely the flagship finding:**
+- Their agent misheard "David Nkemelu" as "David Cam" on first attempt.
+- Asked to confirm/spell the last name **five separate times** across the call (turns 6, 8, 11, 12, 15) — our persona spelled it correctly and identically every time ("N as in November, K as in kilo, E, M, E, L, U") — it was never successfully registered.
+- One turn asked "I speaking with Maria?" — an unexplained identity mismatch (Maria is the call-1 persona's name; possible stale state, though not confirmed).
+- **The call ultimately failed the task**: *"I'm having trouble finding your record in our system so I can't schedule the appointment right now. I'll connect you to our patient support team for help."* — a complete booking failure after repeated, correct input, ending in a live-transfer fallback. Hit `MAX_TURNS=16` shortly after, still not resolved.
+
+This is a stronger, more clear-cut finding than anything found so far — repeated correct input, repeated failure to register it, ending in total task failure. Strong candidate for the top item in the eventual bug report.
+
+**Not yet done:** 10 of 12 calls remain (3 through 12).
+
+---
