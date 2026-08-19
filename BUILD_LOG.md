@@ -21,3 +21,29 @@ Running record of what was built, real decisions/tradeoffs made and why, and any
 **Not yet done:** No code written. No accounts upgraded/verified yet. Step 0 (account + API key verification) starts next.
 
 ---
+
+## 2026-08-19 — Twilio upgraded to paid (Step 0, part 1 of 4)
+
+**What happened:** Upgraded Twilio from trial to Pay As You Go. Console did not offer a smaller starting balance than $20 — confirms the earlier research finding; the full suggested top-up was required, no lower option surfaced. Got a bonus of 75 free voice minutes (no 30-day expiration), which likely covers the entire test-call suite without touching the paid balance.
+
+**Decision:** Selected role "Individual," use-case "Customer Support" (closest fit of the offered onboarding categories, doesn't affect functionality/billing), and "With code" for the build method — matches the plan's Twilio-API-via-Python approach.
+
+**Flagged, not yet resolved:** Auto-recharge is ON (refills to $20 whenever balance drops below $10), with no hard ceiling. Given this project deliberately stress-tests a voice agent for malfunctions (loops, hangs) and the bot code itself is new/unproven, a runaway call loop on either side could trigger repeated auto-recharges beyond the $20 reimbursement cap. Recommended turning it off or lowering the threshold until Step 1 (walking skeleton) is proven stable — user decision pending.
+
+**Not yet done:** ElevenLabs, Deepgram, and LLM API keys not yet confirmed. pgai.us/athena test account not yet created. No code written.
+
+---
+
+## 2026-08-19 — Step 0 complete: all accounts and keys verified
+
+**What happened:** Bought a Twilio phone number (+12602702673, local, $1.15/mo — chosen over toll-free since only outbound Voice capability is needed). Reused existing ElevenLabs, Anthropic, and OpenAI keys from a prior project (BookBridge) rather than generating new ones — a deliberate speed tradeoff, acceptable since those keys won't be used on the other project anymore, so there's no cross-project usage/billing conflict. Generated a fresh Deepgram key. All values placed in a local `.env` (gitignored), scaffolded from `.env.example` (template, no real values, safe to commit).
+
+Created the pgai.us/athena test account for product context, as the plan's setup note required. It redirects to a branded intake form ("Pivot Point Orthopedics, powered by Pretty Good AI") collecting name/email/phone/DOB, then shows a confirmation screen with a demo phone number and a "call me instead" option. **Did not call that number or use "call me instead"** — per the plan's explicit warning, the only number this project ever calls is the fixed test number +1-805-439-8008. Useful context gained: the demo covers appointment scheduling/changes, insurance updates, and prescription refills — informs the scenario design for Step 4's real calls.
+
+**Verification:** Wrote `verify_setup.py`, a small script (not bot code — pure infra check) that pings each service's API with a minimal authenticated request (Twilio account lookup, ElevenLabs user endpoint, Deepgram projects list, Anthropic/OpenAI models list) and reports pass/fail without printing key values. Ran it — all 5 services (Twilio, ElevenLabs, Deepgram, Anthropic, OpenAI) passed.
+
+**Still open:** Twilio auto-recharge flag from the previous entry — not yet turned off. Decide before Step 1 if a runaway call loop during testing is a real concern.
+
+**Step 0 is now complete.** No bot code written yet. Next: Step 1, the thin walking skeleton (Twilio call → Deepgram streaming transcription → VAD/endpointing → scripted ElevenLabs reply → recording + transcript saved), via Pipecat/LiveKit Agents per the Section 7 architecture decision.
+
+---
