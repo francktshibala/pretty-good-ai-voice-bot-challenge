@@ -1,48 +1,21 @@
 """
-Barge-in, piece 1 (this addition): prove overlapping audio actually works
-on a real Twilio call — a scripted interjection fires once, early in the
-call, based on an INTERIM transcript (i.e. while their agent is still
-mid-sentence), instead of waiting for speech_final/UtteranceEnd like every
-other turn. This is deliberately opt-in (INTERRUPT_MODE) and fires at most
-once per call — normal turn-taking for every other exchange is unaffected.
-Built to test bug category 5 (failure to handle interruption) from
-BUG_CATEGORIES.md, which the bot's normal architecture can't probe on its
-own since it always waits for a full turn-end.
+Voice bot media-stream server. Handles a Twilio <Connect><Stream> call:
+receives live caller audio, transcribes it via Deepgram, generates a
+patient-persona reply via an LLM, speaks it back via ElevenLabs, and saves
+a transcript + recording once the call ends. Supports a one-time deliberate
+barge-in (bug category 5 testing) and a real turn/duration safety cap.
 
-Step 2, piece 1 (done): real LLM reasoning replaces the scripted reply —
-proved the LLM call works inside this pipeline with a single exchange
-before piece 2 (below) builds the harder part.
+Full build history (pieces, bugs hit and fixed, decisions and why) lives in
+BUILD_LOG.md, not here — this docstring describes current behavior only.
 
-Step 2, piece 2 (this addition): the conversation now continues across
-multiple turns instead of ending after one reply. A real patient persona
-+ scenario goal (scheduling for knee pain) drives it, with the model
-signaling a natural end via a literal "[END_CALL]" marker in its final
-reply. Two safety caps exist independently of that signal — max turn
-count and max call duration — so a misbehaving LLM or agent loop can
-never turn into a runaway call, same reasoning as the Twilio auto-recharge
-discussion earlier in this log.
+Step 4: persona and interrupt settings are no longer hardcoded constants —
+each call selects a scenario via a query param on the stream URL
+(?scenario=<name>), loaded from scenarios/<name>.json. This is what lets
+12 distinct calls run without hand-editing this file between each one.
 
-Step 1, pieces 2-4, built as one evolving server.
-
-Piece 2, sub-pieces 1-3 (done): tunnel reachable, Twilio frames logged,
-Deepgram live transcription confirmed on a real call.
-
-Piece 3 (done): Deepgram's endpointing/UtteranceEnd signals replace the
-fixed test-script timer as the real "their agent stopped talking" signal.
-
-Piece 4 (done): on turn-end, synthesize a scripted line via ElevenLabs
-(not real LLM reasoning yet — proving the loop closes end to end is the
-point of this piece, per the plan's walking-skeleton step), stream it
-back to Twilio over the same bidirectional connection, then hang up.
-Closes the full loop: call -> transcribe -> detect turn -> speak back ->
-end.
-
-Piece 5 (this addition, last piece of Step 1): save a transcript (JSON,
-both speakers) and download the call recording (mp3) to call_logs/ once
-the call ends — two of the actual deliverables depend on this working.
-
-Run with: python3 -u ws_echo_test.py   (unbuffered — see piece 2 log
-entry for why this matters)
+Run with: python3 -u ws_echo_test.py   (unbuffered — stdout buffering
+delayed logs when piping to a file from a background process; see
+BUILD_LOG.md for the debugging story)
 Then, in another terminal: ngrok http 8000
 """
 
@@ -95,34 +68,57 @@ OPENAI_MODEL = "gpt-4o-mini"  # switched from Anthropic mid-Step 2 — ran out o
 MAX_TURNS = 16  # 8 wasn't enough to reach a natural conclusion in the first real multi-turn test
 MAX_CALL_SECONDS = 180
 
-# Barge-in test (bug category 5). Opt-in per call, fires at most once.
-INTERRUPT_MODE = True
 INTERRUPT_TRIGGER_WORDS = 4  # only interrupt once they're clearly mid-sentence, not on their first word or two
 INTERRUPT_TEXT = "Sorry, can I ask something real quick?"
 
-PATIENT_SYSTEM_PROMPT = (
-    "You are Maria Gonzalez, calling Pivot Point Orthopedics as a new patient. "
-    "You've had knee pain for about two weeks after a hiking trip and want to "
-    "schedule an appointment to get it checked out. You're available weekday "
-    "afternoons. Your date of birth is March 14, 1990, and your phone number is "
-    "555-201-4477. Speak naturally and briefly, like a real person on the phone — "
-    "one or two sentences per turn, no lists, no markdown, no stage directions, "
-    "don't repeat yourself. Answer the receptionist's questions directly and stay "
-    "in character as the patient throughout. Once your appointment is confirmed, "
-    "or the call reaches a natural conclusion (e.g. they take a message or say "
-    "they'll call back), thank them, say goodbye, and end your final reply with "
-    "the exact text [END_CALL] on its own line — do not use that marker at any "
-    "other time."
-)
+SCENARIOS_DIR = "scenarios"
+
+# Used only if a call connects with no ?scenario= param (ad-hoc/manual testing).
+DEFAULT_SCENARIO = {
+    "label": "default_maria",
+    "interrupt_mode": False,
+    "interrupt_min_turn": 0,
+    "persona_prompt": (
+        "You are Maria Gonzalez, calling Pivot Point Orthopedics as a new patient. "
+        "You've had knee pain for about two weeks after a hiking trip and want to "
+        "schedule an appointment to get it checked out. You're available weekday "
+        "afternoons. Your date of birth is March 14, 1990, and your phone number is "
+        "555-201-4477. Speak naturally and briefly, like a real person on the phone — "
+        "one or two sentences per turn, no lists, no markdown, no stage directions, "
+        "don't repeat yourself. Answer the receptionist's questions directly and stay "
+        "in character as the patient throughout. Once your appointment is confirmed, "
+        "or the call reaches a natural conclusion (e.g. they take a message or say "
+        "they'll call back), thank them, say goodbye, and end your final reply with "
+        "the exact text [END_CALL] on its own line — do not use that marker at any "
+        "other time."
+    ),
+}
 
 
-def generate_llm_reply(conversation_history):
+def load_scenario(name):
+    if not name:
+        print("[SCENARIO] no ?scenario= param given, using DEFAULT_SCENARIO")
+        return DEFAULT_SCENARIO
+    path = os.path.join(SCENARIOS_DIR, f"{name}.json")
+    try:
+        with open(path) as f:
+            scenario = json.load(f)
+        scenario.setdefault("interrupt_mode", False)
+        scenario.setdefault("interrupt_min_turn", 0)
+        print(f"[SCENARIO] loaded {name!r}: {scenario.get('label', name)}")
+        return scenario
+    except FileNotFoundError:
+        print(f"[SCENARIO] {path!r} not found, falling back to DEFAULT_SCENARIO")
+        return DEFAULT_SCENARIO
+
+
+def generate_llm_reply(conversation_history, persona_prompt):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
         "Content-Type": "application/json",
     }
-    messages = [{"role": "system", "content": PATIENT_SYSTEM_PROMPT}] + conversation_history
+    messages = [{"role": "system", "content": persona_prompt}] + conversation_history
     payload = {
         "model": OPENAI_MODEL,
         "max_tokens": 150,
@@ -144,10 +140,11 @@ def synthesize_speech_ulaw(text):
     return r.content
 
 
-def save_transcript(call_sid, turns):
+def save_transcript(call_sid, turns, scenario_label):
     path = os.path.join(CALL_LOGS_DIR, f"{call_sid}_transcript.json")
     record = {
         "call_sid": call_sid,
+        "scenario": scenario_label,
         "saved_at": datetime.now(timezone.utc).isoformat(),
         "turns": turns,
     }
@@ -214,6 +211,19 @@ async def media_stream(websocket: WebSocket):
     await websocket.accept()
     print("Twilio media stream connected")
 
+    # Scenario is NOT read from the URL query string — a first attempt at that
+    # silently fell back to DEFAULT_SCENARIO on a real call, because Twilio's
+    # <Stream> verb doesn't reliably forward query params to the actual
+    # WebSocket connection. The documented mechanism is a nested <Parameter>
+    # tag in the TwiML, delivered later via the "start" event's
+    # customParameters — so scenario loading happens there instead, once that
+    # event arrives, not immediately on connect.
+    scenario = DEFAULT_SCENARIO
+    persona_prompt = scenario["persona_prompt"]
+    interrupt_mode = scenario["interrupt_mode"]
+    interrupt_min_turn = scenario["interrupt_min_turn"]
+    scenario_label = scenario.get("label", "default")
+
     frame_count = 0
     call_sid = None
     stream_sid = None
@@ -265,7 +275,7 @@ async def media_stream(websocket: WebSocket):
             except Exception as e:
                 print(f"Failed to hang up call (may have already ended): {e}")
 
-            save_transcript(call_sid, transcript_turns)
+            save_transcript(call_sid, transcript_turns, scenario_label)
             await asyncio.to_thread(download_recording, call_sid)
 
         async def handle_turn_end(reason):
@@ -297,7 +307,7 @@ async def media_stream(websocket: WebSocket):
                 return
 
             print(f"[LLM] turn {turn_count}, generating reply...")
-            reply_text = await asyncio.to_thread(generate_llm_reply, conversation_history)
+            reply_text = await asyncio.to_thread(generate_llm_reply, conversation_history, persona_prompt)
             print(f"[LLM] reply: {reply_text!r}")
             conversation_history.append({"role": "assistant", "content": reply_text})
 
@@ -311,6 +321,7 @@ async def media_stream(websocket: WebSocket):
 
         async def twilio_to_deepgram():
             nonlocal frame_count, call_sid, stream_sid
+            nonlocal persona_prompt, interrupt_mode, interrupt_min_turn, scenario_label
             try:
                 while True:
                     raw = await websocket.receive_text()
@@ -324,8 +335,16 @@ async def media_stream(websocket: WebSocket):
                         start = msg.get("start", {})
                         call_sid = start.get("callSid")
                         stream_sid = start.get("streamSid")
+
+                        scenario_name = start.get("customParameters", {}).get("scenario")
+                        scenario = load_scenario(scenario_name)
+                        persona_prompt = scenario["persona_prompt"]
+                        interrupt_mode = scenario["interrupt_mode"]
+                        interrupt_min_turn = scenario["interrupt_min_turn"]
+                        scenario_label = scenario.get("label", scenario_name or "default")
+
                         print(
-                            f"[start] callSid={call_sid} "
+                            f"[start] callSid={call_sid} scenario={scenario_label} "
                             f"mediaFormat={start.get('mediaFormat')}"
                         )
 
@@ -367,9 +386,10 @@ async def media_stream(websocket: WebSocket):
                             transcript_turns.append({"speaker": "agent", "text": transcript})
                             agent_buffer.append(transcript)
                         elif (
-                            INTERRUPT_MODE
+                            interrupt_mode
                             and not has_interrupted
                             and not call_over
+                            and turn_count >= interrupt_min_turn
                             and len(transcript.split()) >= INTERRUPT_TRIGGER_WORDS
                         ):
                             has_interrupted = True

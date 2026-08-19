@@ -1,14 +1,13 @@
 """
-Step 1, piece 3: confirm real turn-detection — the server (ws_echo_test.py)
-now hangs up the call itself once Deepgram signals the far end stopped
-talking, instead of this script cutting it off on a fixed timer.
+Places one real outbound call, connects it to the media-stream server with
+a specific scenario (persona + settings from scenarios/<name>.json), and
+polls until the call ends naturally (turn-based hangup, safety cap, or the
+far end hanging up) — with an external safety cap in case none of those
+fire for some reason, so a bug never turns into a runaway open call.
 
-This script just places the call and polls status until it ends, with a
-safety cap in case detection fails for some reason (so a bug never turns
-into a runaway open call).
-
-Run with: python3 test_media_stream_call.py <ngrok_public_url>
-Example:  python3 test_media_stream_call.py humorous-subheader-exorcism.ngrok-free.dev
+Run with: python3 test_media_stream_call.py <ngrok_host> [scenario_name]
+Example:  python3 test_media_stream_call.py humorous-subheader-exorcism.ngrok-free.dev 01_baseline
+If scenario_name is omitted, the server falls back to DEFAULT_SCENARIO.
 """
 
 import sys
@@ -33,10 +32,11 @@ def load_env(path=".env"):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 test_media_stream_call.py <ngrok_host_without_protocol>")
+        print("Usage: python3 test_media_stream_call.py <ngrok_host_without_protocol> [scenario_name]")
         sys.exit(1)
 
     ngrok_host = sys.argv[1]
+    scenario_name = sys.argv[2] if len(sys.argv) > 2 else None
     stream_url = f"wss://{ngrok_host}/media-stream"
 
     env = load_env()
@@ -47,17 +47,28 @@ def main():
 
     client = Client(sid, token)
 
+    # Scenario is passed via a nested <Parameter>, not a URL query string —
+    # Twilio's <Stream> verb doesn't reliably forward query params to the
+    # actual WebSocket connection (confirmed the hard way: a first attempt
+    # using ?scenario= silently fell back to the server's default on a real
+    # call). <Parameter> is the documented mechanism; it arrives in the
+    # "start" event's customParameters instead.
+    stream_tag = f'<Stream url="{stream_url}">'
+    if scenario_name:
+        stream_tag += f'<Parameter name="scenario" value="{scenario_name}" />'
+    stream_tag += "</Stream>"
+
     twiml = (
         '<?xml version="1.0" encoding="UTF-8"?>'
         "<Response>"
         "<Connect>"
-        f'<Stream url="{stream_url}" />'
+        f"{stream_tag}"
         "</Connect>"
         "</Response>"
     )
 
     call = client.calls.create(to=to_number, from_=from_number, twiml=twiml, record=True)
-    print(f"Call placed. SID: {call.sid}")
+    print(f"Call placed. SID: {call.sid}  Scenario: {scenario_name or 'DEFAULT_SCENARIO'}")
     print(f"Waiting for the server to detect turn-end and hang up (safety cap: {SAFETY_CAP_SECONDS}s)...")
 
     start = time.time()
