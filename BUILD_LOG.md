@@ -210,3 +210,15 @@ Also fixed a real gap while building this: if the clinic's agent hangs up *first
 **Step 2 is now considered solid.** The mechanism handles real, extended, coherent conversations reliably. Further raising the turn cap on this same test scenario has diminishing returns — better to save "let it fully complete" effort for the actual Step 4 deliverable calls, where finishing naturally matters for call quality, not just mechanism-proving. Next: Step 3, deliberately defining bug categories before the real 10+ calls (rather than continuing to find bugs incidentally).
 
 ---
+
+## 2026-08-19 — Step 3: bug categories defined
+
+**What happened:** Wrote `BUG_CATEGORIES.md` — the plan's 6 example categories, each fleshed out with what it concretely means in this specific system, real evidence already seen from Step 2's calls where applicable, and how Step 4 will deliberately probe for it (rather than just copying the plan's one-line list). Added a 7th category, audio dropout/garbled agent speech, directly from real evidence (the repeated "Please provide your" / "Please provide" fragments in Step 2's second call) — not in the original plan, added because it's a real, distinct failure mode already observed. Also carried forward the attribution-discipline note from Step 2's log (check findings against actual recording audio before attributing STT noise to their system) as a standing rule for the eventual bug report.
+
+Unlike Steps 1 and 2, this step didn't get broken into pieces verified by real test calls — it's a planning/design task with no technical unknown to de-risk, not an engineering step. Broken instead into simpler sequential pieces (define categories -> map to concrete probes -> write up), no calls needed in between.
+
+**Open decision, not yet resolved:** category 5 (failure to handle interruption) can't be genuinely tested by the bot as currently built — it always waits for the agent's full turn-end before replying, with no barge-in capability. Testing this category means either building that capability in, or treating it as a manual one-off test outside the bot's normal flow. Needs a decision before Step 4's scenario design finalizes.
+
+**Not yet done:** Step 4 (designing specific real calls mapped to scenarios and these categories, then making the 10+ real calls) hasn't started.
+
+---
